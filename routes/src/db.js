@@ -133,7 +133,8 @@ const _generateEmptyArtworkEntry = () => {
   artworkObject.user = `default_user`;
   artworkObject.date = `01 01 2021`;
   artworkObject.songId = `default_artist/default_song`;
-  artworkObject.bitmap = `www.store.com/art_default.artwork`;
+  artworkObject.bitmap = [];
+  artworkObject.link = `www.store.com/art_default.artwork`;
   artworkObject.public = false;
 
   return artworkObject;
@@ -147,7 +148,8 @@ const _generateRandomArtworks = (amount) => {
     artworkObject.user = `user_name_${i}`;
     artworkObject.date = `01 ${i} 2020`;
     artworkObject.songId = `artist${i}/song${i}`;
-    artworkObject.bitmap = `www.store.com/art_${i}.artwork`;
+    artworkObject.bitmap = [];
+    artworkObject.link = `www.store.com/art_${i}.artwork`;
     artworkObject.public = false;
 
     artworkObjects.push(artworkObject);
