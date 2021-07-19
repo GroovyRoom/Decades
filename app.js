@@ -1,19 +1,18 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var artworksRouter = require('./routes/artworks');
 var reactRouter = require('./routes/react')
+var authRouter = require('./routes/auth')
 
 var app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
 // Locally we will serve that build/ directory here
 // When app is deployed, GAE sets that variable to "production"
@@ -21,6 +20,7 @@ if (process.env.NODE_ENV !== "production") {
   app.use(express.static(path.join(__dirname, '/client/build')))
 }
 
+app.use('/api/auth/', authRouter)
 app.use('/api/', indexRouter);
 app.use('/api/artworks/', artworksRouter)
 
