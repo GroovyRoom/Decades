@@ -23,7 +23,20 @@ const _uploadArtworkAndFilterRequest = async (artwork) => {
     //assign the link but unassign the bitmap
     artwork.link = artworkURL
     delete artwork.bitmap
+    
     return artwork
+}
+
+const _assertAuthorized = (req) => {
+    if (!req.session){
+        return false
+    }
+
+    if (!req.session.loggedIn){
+        return false
+    }
+
+    return true
 }
 
 //DEBUG API
@@ -57,19 +70,18 @@ router.post(`/debug/reset/:amount`, async (req, res) => {
     res.json(artworks)
 })
 
-//PRODUCTION API
-router.get(`/uploaded`, async (req, res) => {
+router.get(`/debug/prod/uploaded`, async (req, res) => {
     let uploadedArtworks = await DB.GetArtworks(DB.access.UPLOADED_ONLY)
     res.json(uploadedArtworks)
 })
 
-router.get(`/local`, async (req, res) => {
+router.get(`/debug/prod/local`, async (req, res) => {
     const fakeLoggedUser = 'user_name_6'
     let localArtworks = await DB.GetArtworks(DB.access.ALL, fakeLoggedUser)
     res.json(localArtworks)
 })
 
-router.post(`/save`, async (req, res) => {
+router.post(`/debug/prod/save`, async (req, res) => {
     const artwork = await _uploadArtworkAndFilterRequest(req.body)
 
     //update DB
@@ -77,11 +89,69 @@ router.post(`/save`, async (req, res) => {
     res.json(updatedArtwork)
 })
 
-router.post(`/upload`, async (req, res) => {
+router.post(`/debug/prod/upload`, async (req, res) => {
     //same as /save but we need to explicitly mark is as .public = true
     //SAVEs and UPLOADs
     const artwork = await _uploadArtworkAndFilterRequest(req.body)
     artwork.public = true
+    
+    //update DB
+    let updatedArtwork = await DB.UpdateArtwork(artwork)
+    res.json(updatedArtwork)
+})
+
+//PRODUCTION API
+router.get(`/uploaded`, async (req, res) => {
+    if (!_assertAuthorized(req)){
+        res.status(401).send('Not authorized')
+        return
+    }
+
+    let uploadedArtworks = await DB.GetArtworks(DB.access.UPLOADED_ONLY)
+    res.json(uploadedArtworks)
+})
+
+router.get(`/local`, async (req, res) => {
+    if (!_assertAuthorized(req)){
+        res.status(401).send('Not authorized')
+        return
+    }
+
+    const loggedUserId = req.session.userId
+    let localArtworks = await DB.GetArtworks(DB.access.ALL, loggedUserId)
+    res.json(localArtworks)
+})
+
+router.post(`/save`, async (req, res) => {
+    if (!_assertAuthorized(req)){
+        res.status(401).send('Not authorized')
+        return
+    }
+
+    let artwork = await _uploadArtworkAndFilterRequest(req.body)
+
+    //Force user id of logged user regardless of what as passed
+    artwork.user = req.session.userId
+
+    //update DB
+    let updatedArtwork = await DB.UpdateArtwork(artwork)
+    res.json(updatedArtwork)
+})
+
+router.post(`/upload`, async (req, res) => {
+    if (!_assertAuthorized(req)){
+        res.status(401).send('Not authorized')
+        return
+    }
+
+    //SAVEs and UPLOADs
+    let artwork = await _uploadArtworkAndFilterRequest(req.body)
+
+    //Force public to be true regardless of what was passed
+    artwork.public = true
+
+    //Force user id of logged user regardless of what as passed
+    artwork.user = req.session.userId
     
     //update DB
     let updatedArtwork = await DB.UpdateArtwork(artwork)
