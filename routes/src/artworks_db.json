@@ -5,7 +5,8 @@
             "user": "user_name_0",
             "date": "01 0 2020",
             "songId": "artist0/song0",
-            "bitmap": "www.store.com/art_0.artwork",
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_0",
             "public": false
         },
         {
@@ -13,7 +14,8 @@
             "user": "user_name_1",
             "date": "01 1 2020",
             "songId": "artist1/song1",
-            "bitmap": "www.store.com/art_1.artwork",
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_1",
             "public": false
         },
         {
@@ -21,7 +23,8 @@
             "user": "user_name_2",
             "date": "01 2 2020",
             "songId": "artist2/song2",
-            "bitmap": "www.store.com/art_2.artwork",
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_2",
             "public": false
         },
         {
@@ -29,7 +32,8 @@
             "user": "user_name_3",
             "date": "01 3 2020",
             "songId": "artist3/song3",
-            "bitmap": "www.store.com/art_3.artwork",
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_3",
             "public": false
         },
         {
@@ -37,7 +41,8 @@
             "user": "user_name_4",
             "date": "01 4 2020",
             "songId": "artist4/song4",
-            "bitmap": "www.store.com/art_4.artwork",
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_4",
             "public": false
         },
         {
@@ -45,7 +50,8 @@
             "user": "user_name_5",
             "date": "01 5 2020",
             "songId": "artist5/song5",
-            "bitmap": "www.store.com/art_5.artwork",
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_5",
             "public": false
         },
         {
@@ -53,7 +59,8 @@
             "user": "user_name_6",
             "date": "01 6 2020",
             "songId": "artist6/song6",
-            "bitmap": "www.store.com/art_6.artwork",
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_6",
             "public": false
         },
         {
@@ -61,15 +68,17 @@
             "user": "user_name_7",
             "date": "01 7 2020",
             "songId": "artist7/song7",
-            "bitmap": "www.store.com/art_7.artwork",
-            "public": true
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_7",
+            "public": false
         },
         {
             "name": "artwork_name_8",
             "user": "user_name_8",
             "date": "01 8 2020",
             "songId": "artist8/song8",
-            "bitmap": "www.store.com/art_8.artwork",
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_8",
             "public": false
         },
         {
@@ -77,48 +86,9 @@
             "user": "user_name_9",
             "date": "01 9 2020",
             "songId": "artist9/song9",
-            "bitmap": "www.store.com/art_9.artwork",
+            "bitmap": [],
+            "link": "https://storage.googleapis.com/decades_images/artwork_name_9",
             "public": false
-        },
-        {
-            "name": "artwork_name_10",
-            "user": "user_name_10",
-            "date": "01 10 2020",
-            "songId": "artist10/song10",
-            "bitmap": "www.store.com/art_10.artwork",
-            "public": false
-        },
-        {
-            "name": "artwork_name_11",
-            "user": "user_name_11",
-            "date": "01 11 2020",
-            "songId": "artist11/song11",
-            "bitmap": "www.store.com/art_11.artwork",
-            "public": true
-        },
-        {
-            "name": "artwork_name_12",
-            "user": "user_name_12",
-            "date": "01 12 2020",
-            "songId": "artist12/song12",
-            "bitmap": "www.store.com/art_12.artwork",
-            "public": false
-        },
-        {
-            "name": "artwork_name_13",
-            "user": "user_name_13",
-            "date": "01 13 2020",
-            "songId": "artist13/song13",
-            "bitmap": "www.store.com/art_13.artwork",
-            "public": false
-        },
-        {
-            "name": "artwork_name_14",
-            "user": "user_name_14",
-            "date": "01 14 2020",
-            "songId": "artist14/song14",
-            "bitmap": "www.store.com/art_14.artwork",
-            "public": true
         }
     ]
 }

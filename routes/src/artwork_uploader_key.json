@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "decades",
+  "private_key_id": "43fd4dddcccbc3c90089ccdc3cfe459a055a85c5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCviPa174pMSkQD\nJloeYiW1mZB/D5HDe//eZpzQ4rVcwVMPz1cFJ56OddQZgyHPrqyjgb5LHn/Lppda\nm1fHnXNKO6wiAtZ2exJLq9O/zutoSdEAsjZvs5cZD46WcY4AbXxTfxFvNjj17Eiv\n/YFv3Kz5DNmpo+0Z6NlRqQoi+0WwPb2rSCqwYNcIXPRBEuCFivqEI2U1YB0KeWNw\nW4/erXMrhqupD1puOxEh3brsrINejMhn5I1aQVAfniHL2dAVm2haB10JLOH8zzTz\nz1Rf4X67/K5Y41JgaMe0N01xGTmlHDcRuQhXz9M3FBifn4poSOPO+J54aFEmUXAN\nHWyeCsp9AgMBAAECggEABicpqLp3EVIIHMknHwoHMtypaz7HOAA8eZYEuLC9tTzk\nlbkJnpljLjC0qNlHIeHIVOnrGvR8e83A3/DyjIF5JVi+oamSTXBmdYcWItLUvyDZ\nReo5TMSRjxQTxjPAS8UKtt2NJaYTrJEmAh9DfoGQgaFg7tibas1V8s4XWB8RNAqD\nBT0V03FkvliVHxBxyO7DAfwY4siyX+gaE0a94s2YJcSpDnRv9h9x2u1YvcqmvoCT\nFieq6P7mr6NwhFfZX29Xz+1J3BDHeomo1qfH6imbfT/lcJMcy7VsVM3RtSyzoW8h\nPn70pf36v3KszD4SqIixVpPE6fFTpLtfzSSsOOzlcQKBgQDwU9KrSdPpCMQSG3W3\nU065jOuKVkdZgfhIuHzOz0V2YVLFxra+U4Pk6MMAAdck9wNABY97uzu7oqelRCOb\nI0Als8+rWQJRIHt/NZicmbZuFIETRiUwkEaTk7m0MZpCqDfCwINYiL8wA9CWXSnI\ntdPTO6D9oG8HgOp5xaCiqvK2EQKBgQC6+3SZVaSsR35rrCO9Fm0ud6qJ5b70jeJA\niXoNXLC73WtUcf1oTpmk7Jud5ni0VWSjE2DYmkdkOzNeqUT2UKLxYZawyPk40Ud+\nUs1t7NWougzJr2sKvM16jtpQOq+2bCli8mHFqAwuXbPBOyW6Rku8U5aJKttGBJFj\nX+xMEeSxrQKBgDz35vARcLMjyCoX0UtK1SP5fh/AN6WbdVNtiiwlJSgdFJScDuxF\n36YI7r9nuB7mk2qAfqATJdo6L3Gb0bSfwrxN25dKo23VYb8p56eCz2cpyH0NRI4H\nbAAwb+Io20uhxVOg5zFkr6wMq7QZumnyxuRFslflhYVPzSxLWK8r0xshAoGAFpis\nzpr6+5boQDrdVsyPBT6Q7XlGSmebIBF9HoBFG272uY3NAf39s2CkrcBcde6b6tk8\nqvB6EDLXUmlCXEICbwlMHLEs7SDdcvauvMoSSAGz6eu5E+MdMeJxn6B3+6O2nK6O\nAkT8s92/C2sKdChqnqe7WXhEZ4HF0CyXcdn3uUECgYAgiNh4EDyaI0YFVcc6Po0n\nS9s+nUgOiochNpj3K32SSWAv9sGWecnAHjeCAnTGVMXiMohqhisUoptuIEoW+Z+C\nDOUJ1kJOMYJApP/ZBmpL7ncUiQjU693zoV3LEVn/WEVacKNqvZk4D3ao5bdnyvek\ne1Srw79U690J+V685/miXQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "artwork-uploader@decades.iam.gserviceaccount.com",
+  "client_id": "110907422241726913564",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/artwork-uploader%40decades.iam.gserviceaccount.com"
+}
