@@ -32,6 +32,7 @@
 - We are using Notion to monitor team's tasks, our plans for the current and upcoming sprints.
 - It is also a place where we share our architecture plans and document the latest state of Design.
 - Our current MVP app design is available in the following figma link: https://www.figma.com/proto/9QRXz0foYBYXoPZ4kb4nw8/Decades?page-id=122%3A2&node-id=122%3A2109&scaling=scale-down. This is used by the frontend as a reference for the UI/UX.
+- Our original (bigger scope) design can be seen in this figma: https://www.figma.com/proto/9QRXz0foYBYXoPZ4kb4nw8/Decades?page-id=0%3A1&node-id=1%3A2&viewport=358%2C35%2C0.021770723164081573&scaling=scale-down&starting-point-node-id=1%3A2
 
 ### Team Contribution
 
