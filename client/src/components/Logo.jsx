@@ -2,19 +2,20 @@ import React from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
-    rootHolder: {
-      marginTop: '30px',
-      marginLeft: '475px',
-      padding: '0 10px',
-      justifyContent: 'center'
-    },
-  });
+  rootHolder: {
+    // marginTop: '30px',
+    // marginLeft: '475px',
+    display: 'flex',
+    padding: '0 10px',
+    justifyContent: 'center'
+  },
+});
 
 
 const Logo = () => {
-    const classes = useStyles();
+  const classes = useStyles();
   return (
-    <div className={classes.rootHolder}>   
+    <div className={classes.rootHolder}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="300"
