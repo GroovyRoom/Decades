@@ -1,5 +1,5 @@
 const express = require(`express`)
-const DB = require(`./src/db`)
+const DB = require(`./src/db_firebase`)
 const uploader = require(`./src/upload_artwork`)
 
 const router = express.Router()
