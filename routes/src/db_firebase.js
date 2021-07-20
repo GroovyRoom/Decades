@@ -16,6 +16,11 @@ const db = {
 
   UpdateArtwork: async function (artwork) {
     let artworkID = artwork.id
+    //TODO: quick and dirty solution for missing id
+    if (artworkID === undefined){
+      artworkID = "id"
+    }
+
     let dbArtwork = await FirestoreClient.searchById(artworkID)
     if (dbArtwork === undefined){
       //Create new
