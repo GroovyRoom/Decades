@@ -5,6 +5,8 @@ import CardContent from "@material-ui/core/CardContent";
 import { makeStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
+import GoogleAuthButton from '../components/GoogleAuthButton'
+
 
 const useStyles = makeStyles({
   rootHolder: {
@@ -45,7 +47,7 @@ const LogIn = () => {
           <Typography className={classes.title} variant="h5" component="h2">
             Log in to Decades
           </Typography>
-          <Button onClick={handleClick} variant="contained">Log in with Google</Button>
+          <GoogleAuthButton />
         </CardContent>
       </Card>
     </div>
