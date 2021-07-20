@@ -1,5 +1,47 @@
 # decades
 
+## Project Information
+
+- Project GitLab URL: https://csil-git1.cs.surrey.sfu.ca/vryzhov/decades
+- Project name: Decades
+- Deployed App: https://decades.nn.r.appspot.com/
+
+## Checkpoint Write-Up
+
+### Implemented Features
+
+- **Authentication**. Users can log in the website with their Google Account using Google single sign-on. All the production backend queries are checking against a valid authentication to proceed and some of the queries require a currently logged user information.
+- **Soundcloud Integration**. When you navigate to https://decades.nn.r.appspot.com/music you can click on Play and Pause buttons to play a hard-coded track. The idea is for these buttons to exist on the View page where the user can view the artwork and listen to the track the creator has chosen.
+- **Frontend Visuals**. You can see the project coming together by visiting some of the pages like `https://decades.nn.r.appspot.com/menu`
+    - Eugene write up about frontend a bit. Maybe explain structure set up and how things are going to be implemented
+- **Database for Artworks**. You can add and edit artworks to the Decades artworks database. Right now it is available only via API. We use Google Firestore for storing metadata (name, song id, etc.) and the Google Cloud Storage to store image data. We then link Google Cloud Storage image file to the artwork metadata entry. The idea is that client will first retrieve metadata and then download the image separately. If the client saves the image, then it is okay to pass an entire RGB array to our backend - we only pass it during artwork saving.
+    - You can test how API works. These are non-production queries used to test the DB and bypass authentication (they all have production alternatives which respect the authentication). You can use https://reqbin.com/ to test these.
+    - GET https://decades.nn.r.appspot.com/api/artworks/debug/prod/uploaded - this will return all the uploaded, public artworks. Note than you can download artworks right in the browser by pasting "link" property.
+    - POST https://decades.nn.r.appspot.com/api/artworks/debug/prod/save, JSON body: `{"user": "user_343532", "name": "test_art_132435", "bitmap":[1, 2, 3, 4, 5, 6]}` - you will get back a new DB entry with the ID. You can then pass this ID to the body to _update_ the entry rather than create a new one. Note that this also assigns a link - in the backend the server takes `bitmap` field, turns it into the blob and uploads to Google Cloud Storage.
+    - POST https://decades.nn.r.appspot.com/api/artworks/debug/prod/upload, JSON body : `{"id": "some_id", "user": "user_343532", "name": "test_art_132435", "bitmap":[1, 2, 3, 4, 5, 6]}` - this will either create and upload entry or upload entry if ID exists. Upload in our case means that the `public` property is set to `true`. After you uploaded, make sure to visit `/uploaded` endpoint to see the uploaded artwork.
+    - There are other endpoints you can use for testing like `/api/artworks/debug/all`, `/api/artworks/debug/:user` and etc.
+
+### Project Pipeline
+
+- We spent quite a bit of time coming up with how to efficiently develop, test and run the project. We use Express for Backend and React for frontend. Combining the two into one appeared to be not a trivial task.
+- You can see that we set up the CI/CD pipeline for this project (as per `.gitlab-ci.yml`) which automatically builds, test and even _deploys_ the project for merge requests and commits to `master` branch. We set up a GitLab runner as a GCP VM instance and right now it is off for the budget reasons. Our project building procedure is described in `build_decades.js` and testing is in `pipeline_test.js`.
+- Below this you will see some of development instructions for the team. By using customly designed `npm` scripts our team can easily test and iterate on their work.
+
+### Project Design and Team Management
+
+- We are using Notion to monitor team's tasks, our plans for the current and upcoming sprints.
+- It is also a place where we share our architecture plans and document the latest state of Design.
+- Our current MVP app design is available in the following figma link: https://www.figma.com/proto/9QRXz0foYBYXoPZ4kb4nw8/Decades?page-id=122%3A2&node-id=122%3A2109&scaling=scale-down. This is used by the frontend as a reference for the UI/UX.
+
+### Team Contribution
+
+- First of all, the commits history may be misleading. Sometimes team members merged the branches of their fellow team members (thus documented as commit), and we have set up the commit squish so all merge requests pass as a singular commit. I believe that the following contribution description will reflect the amount of delivered work more truthfully:
+- **Albert:** primarily investigated and implemented authentication and Soundcloud integration. Thanks to Albert we have almost seamless Soundcloud functionality when the business already stopped (!) giving out project ids for API. Albert found a clever trick to use the Soundcloud widget to play publicly available music - and by hiding it, this seems like a custom Soundcloud player. 
+- **Eugene:** handled most of the front-end setup and implementation. Thanks to Eugene it was very easy to add new pages for debugging even for some backend developers. Eugene took it to the next level when transferring the design from Figma prototype to the React - it appears that our frontend would be a so-called "pixel-perfect" implementation, meaning it would be extremely close to the original design intention.
+- **Oleg:** extended frontend functionality together with Eugene. He was tasked with implementing the Editor and most of his work is prototypical and remained away from the sight of the repository - but we can't wait to show you how the drawing works and how it ties together with the rest of the functionality.
+- **Jason:** implemented Firestore Database functionality for the backend. Thanks to Jason we now have quite a robust way to update entries in the database. Jason also helped in many different areas throughout the project - his research helped boost the productivity of the entire team.
+- **Vlad:** implemented backend structure, connected endpoints with the Firestore Database. He also implemented the logic for storing the images in the Google Cloud Storage. Vlad authored CI/CD pipeline and administrative side in GCP and GAE. The design for UI/UX was also done by Vlad.  
+
 ## Installation
 
 - Install node: https://nodejs.org/en/download/. Node is essential to develop and run the Decades.
