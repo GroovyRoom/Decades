@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Logo from './components/Logo'
+import Menu from './pages/Menu'
 
 const theme = createTheme({
   palette: {
@@ -26,10 +27,11 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-      <Logo/>
+        <Logo />
         <Switch>
           <Route path="/" exact component={Login} />
           <Route path="/loading" exact component={LoadingScreen} />
+          <Route path="/menu" exact component={Menu} />
         </Switch>
       </Router>
     </ThemeProvider>
