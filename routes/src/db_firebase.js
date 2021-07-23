@@ -35,40 +35,6 @@ const db = {
 };
 
 ////// HELPERS
-
-const basicColors = [
-  [0, 0, 0], //black
-  [255, 255, 255], //white
-  [255, 0, 0], //red
-  [0, 255, 0], //green
-  [0, 0, 255], //blue
-  [255, 255, 0], //yellow
-  [255, 0, 255], //pink
-  [0, 255, 255], //cyan
-];
-
-const _generateRandomColorInt = () => {
-  return [
-    Math.floor(Math.random() * 255),
-    Math.floor(Math.random() * 255),
-    Math.floor(Math.random() * 255),
-  ];
-};
-
-const _getRandomLinearBitmap = (width, height) => {
-  const randomColorRGBInt = _generateRandomColorInt();
-  let bitmap = [];
-  for (let row = 0; row < height; row++) {
-    for (let col = 0; col < width; col++) {
-      bitmap.push(randomColorRGBInt[0]);
-      bitmap.push(randomColorRGBInt[1]);
-      bitmap.push(randomColorRGBInt[2]);
-    }
-  }
-
-  return bitmap;
-};
-
 const _generateEmptyArtworkEntry = () => {
 
     let data = {
