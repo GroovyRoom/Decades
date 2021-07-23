@@ -22,6 +22,40 @@ const _getRandomLinearBitmap = (width, height) => {
   return bitmap;
 };
 
+// Generates three horizontal color stripes
+const _getThreeColorStripesBitmap = (width, height) => {
+    const randomColorRGBInt1 = _generateRandomColorInt()
+    const randomColorRGBInt2 = _generateRandomColorInt()
+    const randomColorRGBInt3 = _generateRandomColorInt()
+
+    let bitmap = [];
+    for (let row = 0; row < Math.floor(height/3); row++) {
+        for (let col = 0; col < width; col++) {
+        bitmap.push(randomColorRGBInt1[0]);
+        bitmap.push(randomColorRGBInt1[1]);
+        bitmap.push(randomColorRGBInt1[2]);
+        }
+    }
+
+    for (let row = Math.floor(height/3); row < Math.floor(2*height/3); row++) {
+        for (let col = 0; col < width; col++) {
+        bitmap.push(randomColorRGBInt2[0]);
+        bitmap.push(randomColorRGBInt2[1]);
+        bitmap.push(randomColorRGBInt2[2]);
+        }
+    }
+
+    for (let row = Math.floor(2*height/3); row < height; row++) {
+        for (let col = 0; col < width; col++) {
+        bitmap.push(randomColorRGBInt3[0]);
+        bitmap.push(randomColorRGBInt3[1]);
+        bitmap.push(randomColorRGBInt3[2]);
+        }
+    }
+
+  return bitmap;
+}
+
 const basicColors = [
   [0, 0, 0], //black
   [255, 255, 255], //white
@@ -35,7 +69,7 @@ const basicColors = [
 
 
 const _compress = (bytes) => {
-    //do something
+    //TODO: do something
     return bytes
 }
 
@@ -46,12 +80,11 @@ const _getSizeKB = (buffer) => {
     return kBytes
 }
 
-
 // contains a linear array of 1228800 entries (640x640xRGB pixels)
-const randomBitmap = _getRandomLinearBitmap(640, 640)
+const randomStripesBitmap = _getThreeColorStripesBitmap(640, 640)
 
 // the bitmap is now just byte data. You can imagine it is going to store more than pixel data there
-const bytes = Buffer.from(randomBitmap)
+const bytes = Buffer.from(randomStripesBitmap)
 const compressedBytes = _compress(bytes)
 
 console.log(`Size before compression: ${_getSizeKB(bytes)} KB; ${_getSizeKB(bytes)/1024} MB.`)
