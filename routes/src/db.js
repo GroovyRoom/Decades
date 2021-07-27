@@ -84,6 +84,13 @@ const db = {
     return existingArtwork;
   },
 
+  Clear: async function () {
+    let data = await this.GetArtworks();
+    data.artworks = []
+    await _writeToDatabaseFile(data)
+    return data;
+  },
+
   ResetWithRandomArtworks: async function (amount) {
     let data = await this.GetArtworks();
     data.artworks = _generateRandomArtworks(amount);

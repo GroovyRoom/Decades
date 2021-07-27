@@ -2,6 +2,7 @@ const fse = require(`fs-extra`);
 const helpers = require(`./global_helpers`)
 const FirestoreClient = require('./firestoreClient');
 const path = require('path');
+const Artwork = require('./artwork_dt')
 
 const db = {
   access: {
@@ -14,24 +15,33 @@ const db = {
     return FirestoreClient.GetArtworks(access, user);
   },
 
+  GetArtwork: async function (artworkId) {
+    return FirestoreClient.searchById(artworkId)
+  },
+
   UpdateArtwork: async function (artwork) {
-    let artworkID = artwork.id
+    // Ensure that it is a regular object
+    let artworkObject = {...artwork}
+
     //TODO: quick and dirty solution for missing id
-    if (artworkID === undefined){
-      artworkID = "id"
+    if (artworkObject.id === undefined || artworkObject.id === null){
+      artworkObject.id = "id"
     }
 
-    let dbArtwork = await FirestoreClient.searchById(artworkID)
+    let dbArtwork = await FirestoreClient.searchById(artworkObject.id)
     if (dbArtwork === undefined){
       //Create new
-      let newArtwork = _generateEmptyArtworkEntry();
-      artworkID = await FirestoreClient.save(newArtwork);
+      let newDBEntry = {...new Artwork()}
+      artworkObject.id = await FirestoreClient.save(newDBEntry);
     }
 
-    //Update all fields except artwork.id
-    delete artwork.id
-    return await FirestoreClient.updatePossibleFields(artworkID, artwork)
+    return await FirestoreClient.updatePossibleFields(artworkObject.id, artworkObject)
   },
+
+  Clear: async function () {
+    //remove in firestore client
+    return await FirestoreClient.clear()
+  }
 };
 
 ////// HELPERS

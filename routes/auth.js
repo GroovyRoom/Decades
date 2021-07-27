@@ -1,6 +1,4 @@
 const express = require(`express`)
-const cookieParser = require('cookie-parser');
-const session = require('express-session');
 const {OAuth2Client} = require('google-auth-library');
 
 //TODO: Testing App. Need to make a proper App.
@@ -8,10 +6,6 @@ const clientID = "244554015002-dq6ervkiinn5ocu3c0bkngrgnmtalfok.apps.googleuserc
 
 const router = express.Router()
 const oauth = new OAuth2Client(clientID);
-
-// Set session cookie name to "userID"
-router.use(cookieParser())
-router.use(session({name: 'userID', secret: 'cat', saveUninitialized: false, resave: false}));
 
 router.post('/login', async (req, res) => {
     const {token} = req.body;
@@ -43,6 +37,18 @@ router.post('/login', async (req, res) => {
         }
 
     })
+})
+
+// Debug login for non-browser testing
+router.post('/login2/:name', async (req, res) => {
+    if (req.session.userId){
+        res.status(200).send(`Already logged in, the user id is ${req.session.userId}`)
+        return 
+    }
+
+    req.session.loggedIn = true;
+    req.session.userId = req.params.name;
+    res.status(200).send(`Successfully logged in! User name is ${req.session.userId}`)
 })
 
 router.post('/logout', async (req, res) => {
