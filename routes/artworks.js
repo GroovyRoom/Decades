@@ -1,33 +1,11 @@
 const express = require(`express`)
 const DB = require(`./src/db_firebase`)
 const uploader = require(`./src/upload_artwork`)
+const Artwork = require(`./src/artwork_dt`)
 
 const router = express.Router()
 
-//TODO: this logic is not present. Right now the client can simply download the bucket files.
-//Need to revise this and somehow supply the bitmaps from the server or make extra rules for who can download
-//bucket files.
-const _populateArtworksBitmaps = async (artworks) => {
-    for (let artwork of artworks.artworks){
-        const bitmap = await uploader.downloadArtwork(artwork)
-        artwork.bitmap = bitmap
-    }
-
-    return artworks
-}
-
-const _uploadArtworkAndFilterRequest = async (artwork) => {
-    //artwork.bitmap would have the bitmap
-    const artworkURL = await uploader.uploadArtwork(artwork)
-
-    //assign the link but unassign the bitmap
-    artwork.link = artworkURL
-    delete artwork.bitmap
-    
-    return artwork
-}
-
-const _assertAuthorized = (req) => {
+const _assertAPIAuthorized = (req) => {
     if (!req.session){
         return false
     }
@@ -39,70 +17,46 @@ const _assertAuthorized = (req) => {
     return true
 }
 
-//DEBUG API
-router.get(`/debug/all`, async (req, res) => {
-    let allArtworks = await DB.GetArtworks(DB.access.ALL)
-    res.json(allArtworks)
-})
-
-router.get(`/debug/:user`, async (req, res) => {
-    let allArtworks = await DB.GetArtworks(DB.access.ALL, req.params.user)
-    res.json(allArtworks)
-})
-
-
-//Randomly generate artworks for testing
-router.post(`/debug/reset/:amount`, async (req, res) => {
-    const artworks = await DB.ResetWithRandomArtworks(req.params.amount)
-    let defaultBitmap = []
-    for (let i = 0; i<640; i++){
-        for (let j = 0; j<640; j++){
-            defaultBitmap.push(255);
-        }
+const _assertEditAuthorized = async (artworkID, req) => {
+    if (artworkID === null || artworkID === undefined){
+        // Intention is to create a new one
+        return true
     }
 
-    for (let artwork of artworks.artworks){
-        artwork.bitmap = defaultBitmap
-        artwork = await _uploadArtworkAndFilterRequest(artwork)
-        await DB.UpdateArtwork(artwork)
+    // Intention is to update, need to check if authorized
+    const dbEntry = await DB.GetArtwork(artworkID)
+    if (dbEntry === null || dbEntry === undefined){
+        // Wanted to update, but passed incorrect ID. Treat as new artwork creation
+        return true
     }
 
-    res.json(artworks)
-})
+    // Confirm whether logged in user is the same user associated with the entry
+    return req.session.userId === dbEntry.user
+}
 
-router.get(`/debug/prod/uploaded`, async (req, res) => {
-    let uploadedArtworks = await DB.GetArtworks(DB.access.UPLOADED_ONLY)
-    res.json(uploadedArtworks)
-})
+const _assertDownloadAuthorized = async (artworkID, req) => {
+    if (artworkID === null || artworkID === undefined){
+        // Id is invalid, no artwork to download
+        return false
+    }
 
-router.get(`/debug/prod/local`, async (req, res) => {
-    const fakeLoggedUser = 'user_name_6'
-    let localArtworks = await DB.GetArtworks(DB.access.ALL, fakeLoggedUser)
-    res.json(localArtworks)
-})
+    const dbEntry = await DB.GetArtwork(artworkID)
+    if (dbEntry === null || dbEntry === undefined){
+        // No associated artwork entry with id
+        return false
+    }
 
-router.post(`/debug/prod/save`, async (req, res) => {
-    const artwork = await _uploadArtworkAndFilterRequest(req.body)
+    if (dbEntry.public){
+        // Public artworks are available to all logged in users
+        return true
+    }
 
-    //update DB
-    let updatedArtwork = await DB.UpdateArtwork(artwork)
-    res.json(updatedArtwork)
-})
+    // If artwork is private, only allow download to users who create the artwork
+    return req.session.userId === dbEntry.user
+}
 
-router.post(`/debug/prod/upload`, async (req, res) => {
-    //same as /save but we need to explicitly mark is as .public = true
-    //SAVEs and UPLOADs
-    const artwork = await _uploadArtworkAndFilterRequest(req.body)
-    artwork.public = true
-    
-    //update DB
-    let updatedArtwork = await DB.UpdateArtwork(artwork)
-    res.json(updatedArtwork)
-})
-
-//PRODUCTION API
 router.get(`/uploaded`, async (req, res) => {
-    if (!_assertAuthorized(req)){
+    if (!_assertAPIAuthorized(req)){
         res.status(401).send('Not authorized')
         return
     }
@@ -112,7 +66,7 @@ router.get(`/uploaded`, async (req, res) => {
 })
 
 router.get(`/local`, async (req, res) => {
-    if (!_assertAuthorized(req)){
+    if (!_assertAPIAuthorized(req)){
         res.status(401).send('Not authorized')
         return
     }
@@ -123,39 +77,60 @@ router.get(`/local`, async (req, res) => {
 })
 
 router.post(`/save`, async (req, res) => {
-    if (!_assertAuthorized(req)){
+    if (!_assertAPIAuthorized(req)){
         res.status(401).send('Not authorized')
         return
     }
 
-    let artwork = await _uploadArtworkAndFilterRequest(req.body)
+    // body has meta field and bitmap field
+    // meta is an artwork object and bitmap is an array
 
-    //Force user id of logged user regardless of what as passed
-    artwork.user = req.session.userId
+    // we need to make sure that if we push updates to the artwork - we are authorized to do so.
+    // this can only happen if we pass in ID we want to update but we are not the creator.
+
+    const editAuthorized = await _assertEditAuthorized(req.body.meta.id, req)
+    if (!editAuthorized){
+        res.status(401).send('Not authorized to edit the artwork')
+        return
+    }
+
+    //Force the user field to be the current logged in user
+    req.body.meta.user = req.session.userId
 
     //update DB
-    let updatedArtwork = await DB.UpdateArtwork(artwork)
-    res.json(updatedArtwork)
+    const dbEntry = await DB.UpdateArtwork(req.body.meta)
+
+    //client always supplies the bitmap when saving.
+    //if nothing is supplied, then a white bitmap is submitted. This should never happen though.
+    let bitmap = req.body.bitmap
+    if (bitmap === null || bitmap === undefined){
+        bitmap = Artwork.generateWhiteBitmap(640, 640)
+    }
+
+    //TODO: validate size! Must always have 640x640x3 entries
+    await uploader.uploadArtwork(dbEntry.id, bitmap)
+
+    res.json(dbEntry)
 })
 
-router.post(`/upload`, async (req, res) => {
-    if (!_assertAuthorized(req)){
+//downloads the artwork data.
+router.get(`/artwork/:artwork`, async (req, res) => {
+    if (!_assertAPIAuthorized(req)){
         res.status(401).send('Not authorized')
         return
     }
 
-    //SAVEs and UPLOADs
-    let artwork = await _uploadArtworkAndFilterRequest(req.body)
+    // Artwork id is guaranteed to be there by construction
+    const artworkId = req.params.artwork
 
-    //Force public to be true regardless of what was passed
-    artwork.public = true
+    const downloadAuthorized = await _assertDownloadAuthorized(artworkId, req)
+    if (!downloadAuthorized){
+        res.status(401).send('Not authorized to download artwork')
+        return
+    }
 
-    //Force user id of logged user regardless of what as passed
-    artwork.user = req.session.userId
-    
-    //update DB
-    let updatedArtwork = await DB.UpdateArtwork(artwork)
-    res.json(updatedArtwork)
+    const bitmap = await uploader.downloadArtwork(artworkId)
+    res.send(bitmap)
 })
 
 module.exports = router

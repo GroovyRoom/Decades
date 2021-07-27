@@ -12,8 +12,8 @@ const util = require('util')
 const bucket = storage.bucket('decades_images')
 
 //https://medium.com/@olamilekan001/image-upload-with-google-cloud-storage-and-node-js-a1cf9baa1876
-const uploadArtwork = (artwork) => new Promise((resolve, reject) => {
-    const blob = bucket.file(artwork.name)
+const uploadArtwork = (artworkId, bitmap) => new Promise((resolve, reject) => {
+    const blob = bucket.file(artworkId)
     const blobStream = blob.createWriteStream({
         resumable: false
     })
@@ -23,14 +23,14 @@ const uploadArtwork = (artwork) => new Promise((resolve, reject) => {
     }).on('error', (err) => {
         console.error(err)
         reject('Unable to upload the artwork, something went wrong')
-    }).end(Buffer.from(artwork.bitmap))
+    }).end(Buffer.from(bitmap))
 })
 
-const downloadArtwork = async (artwork) => {
-    const remoteArtworkFile = bucket.file(artwork.name)
+const downloadArtwork = async (artworkId) => {
+    const remoteArtworkFile = bucket.file(artworkId)
     const artworkExists = await remoteArtworkFile.exists()
     if (!artworkExists[0]){
-        console.error(`Tried to load the artwork ${artwork.name} that doesn't exist in the storage`)
+        console.error(`Tried to load the artwork ${artworkId} that doesn't exist in the storage`)
         return []
     }
 
@@ -42,5 +42,13 @@ const downloadArtwork = async (artwork) => {
     return bitmap
 }
 
+const clearStore = async() => {
+    const [files] = await bucket.getFiles()
+    for (const file of files) {
+        await file.delete()
+    }
+}
+
 module.exports.uploadArtwork = uploadArtwork
 module.exports.downloadArtwork = downloadArtwork
+module.exports.clearStore = clearStore
