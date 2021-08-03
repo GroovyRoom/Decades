@@ -1,6 +1,7 @@
 const express = require(`express`)
 const DB = require(`./src/db_firebase`)
 const uploader = require(`./src/upload_artwork`)
+const compress = require(`./src/compress`)
 
 const router = express.Router()
 
@@ -157,5 +158,38 @@ router.post(`/upload`, async (req, res) => {
     let updatedArtwork = await DB.UpdateArtwork(artwork)
     res.json(updatedArtwork)
 })
+
+//downloads the artwork data.
+router.get(`/artwork/:artwork`, async (req, res) => {
+    /*
+    if (!_assertAPIAuthorized(req)){
+        res.status(401).send('Not authorized')
+        return
+    }
+    */
+    // Artwork id is guaranteed to be there by construction
+    const artworkId = req.params.artwork
+    /*
+    const downloadAuthorized = await _assertDownloadAuthorized(artworkId, req)
+    if (!downloadAuthorized){
+        res.status(401).send('Not authorized to download artwork')
+        return
+    }
+    */
+    const bitmap = await uploader.downloadArtwork(artworkId);
+    
+    compressor.compressData("[" + bitmap.toString() + "]", (data) => {
+        res.setHeader('Content-Encoding', 'br');
+        res.setHeader('Content-Type', 'text/plain');
+        res.send(data);
+    });
+    
+   res.send(bitmap);
+})
+
+router.get('/compressTest', (req, res) => {
+    compress.testCompression();
+    res.send("");
+});
 
 module.exports = router

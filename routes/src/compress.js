@@ -1,4 +1,5 @@
 const fse = require('fs-extra')
+const zlib = require('zlib');
 
 const _generateRandomColorInt = () => {
   return [
@@ -68,9 +69,10 @@ const basicColors = [
 ];
 
 
-const _compress = (bytes) => {
-    //TODO: do something
-    return bytes
+const _compress = (bytes, callback) => {
+  zlib.brotliCompress(bytes, (err, buff) => {
+    callback(buff);
+  });
 }
 
 // Assume that each entry can be in range of 0-255, so only 1 byte per entry
@@ -80,12 +82,21 @@ const _getSizeKB = (buffer) => {
     return kBytes
 }
 
-// contains a linear array of 1228800 entries (640x640xRGB pixels)
-const randomStripesBitmap = _getThreeColorStripesBitmap(640, 640)
+const testCompression = () => {
+  // contains a linear array of 1228800 entries (640x640xRGB pixels)
+  const randomStripesBitmap = _getThreeColorStripesBitmap(640, 640)
 
-// the bitmap is now just byte data. You can imagine it is going to store more than pixel data there
-const bytes = Buffer.from(randomStripesBitmap)
-const compressedBytes = _compress(bytes)
+  // the bitmap is now just byte data. You can imagine it is going to store more than pixel data there
+  const bytes = Buffer.from(randomStripesBitmap)
+  _compress(bytes, (compressed) => {
+    console.log(`Size before compression: ${_getSizeKB(bytes)} KB; ${_getSizeKB(bytes)/1024} MB.`)
+    console.log(`Size after compression: ${_getSizeKB(compressed)} KB; ${_getSizeKB(compressed)/1024} MB`)
+  })
+}
 
-console.log(`Size before compression: ${_getSizeKB(bytes)} KB; ${_getSizeKB(bytes)/1024} MB.`)
-console.log(`Size after compression: ${_getSizeKB(compressedBytes)} KB; ${_getSizeKB(compressedBytes)/1024} MB`)
+module.exports.testCompression = testCompression;
+
+
+
+
+
