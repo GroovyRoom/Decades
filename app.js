@@ -2,7 +2,8 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
-const cookieParser = require('cookie-parser');
+const {FirestoreStore} = require('@google-cloud/connect-firestore');
+const FirestoreClient = require('./routes/src/firestoreClient');
 const session = require('express-session');
 
 var indexRouter = require('./routes/index');
@@ -17,9 +18,11 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Set session cookie name to "userID"
-app.use(cookieParser())
-app.use(session({name: 'userID', secret: 'cat', saveUninitialized: false, resave: false}));
+// Create a firestore database to persistently store our sessions.
+app.use(session({store: new FirestoreStore({
+  dataset: FirestoreClient.firestore,
+  kind: "sessions"
+}), secret: 'cat', saveUninitialized: true, resave: false, cookie: {maxAge: 1000000000}}));
 
 // Locally we will serve that build/ directory here
 // When app is deployed, GAE sets that variable to "production"

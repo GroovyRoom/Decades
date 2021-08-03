@@ -135,6 +135,20 @@ class FirestoreClient {
     async clear() {
         await deleteCollection(this.firestore, 'artworks', 50)
     }
+
+    async getAllSessions() {
+        let allSessions = [];
+
+        let sessionsRef = await this.firestore.collection('sessions');
+        sessionsRef = await sessionsRef.get();
+        sessionsRef.forEach(sess => {
+            allSessions.push(sess.data());
+        })
+
+        console.log(allSessions);
+
+        return allSessions;
+    }
 }
 
 module.exports = new FirestoreClient();
