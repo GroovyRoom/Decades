@@ -2,6 +2,7 @@ const express = require(`express`)
 const DB = require(`./src/db_firebase`)
 const uploader = require(`./src/upload_artwork`)
 const compress = require(`./src/compress`)
+const compressor = require(`./src/compressor`)
 
 const router = express.Router()
 
@@ -183,8 +184,6 @@ router.get(`/artwork/:artwork`, async (req, res) => {
         res.setHeader('Content-Type', 'text/plain');
         res.send(data);
     });
-    
-   res.send(bitmap);
 })
 
 router.get('/compressTest', (req, res) => {
