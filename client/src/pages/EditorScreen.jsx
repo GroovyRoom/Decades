@@ -58,7 +58,9 @@ const _save = (id, history, isPublic = false) => {
     requestData.meta.id = id;
   }
 
-  requestData.meta.public = isPublic
+  if (isPublic){
+    requestData.meta.public = true
+  }
 
   requestData.bitmap = bitmap;
 
