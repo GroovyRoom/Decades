@@ -1,5 +1,6 @@
 const express = require(`express`)
 const {OAuth2Client} = require('google-auth-library');
+const DB = require(`./src/db_firebase`)
 
 //TODO: Testing App. Need to make a proper App.
 const clientID = "244554015002-dq6ervkiinn5ocu3c0bkngrgnmtalfok.apps.googleusercontent.com";
@@ -97,5 +98,11 @@ router.get(`/test`, (req, res) => {
         res.send('Client is not authorized!')
     }
 })
+
+router.get('/sessions', async (req, res) => {
+    let sess = await DB.getAllSessions();
+
+    res.json(sess);
+});
 
 module.exports = router

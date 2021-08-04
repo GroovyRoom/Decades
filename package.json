@@ -13,6 +13,7 @@
     "deploy": "gcloud --quiet app deploy deployment/app.yaml"
   },
   "dependencies": {
+    "@google-cloud/connect-firestore": "^2.0.1",
     "@google-cloud/firestore": "^4.13.2",
     "@google-cloud/storage": "^5.8.5",
     "@material-ui/core": "^4.12.1",

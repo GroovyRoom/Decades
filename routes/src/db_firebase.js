@@ -41,6 +41,10 @@ const db = {
   Clear: async function () {
     //remove in firestore client
     return await FirestoreClient.clear()
+  },
+
+  getAllSessions: async function() {
+    return FirestoreClient.getAllSessions();
   }
 };
 
