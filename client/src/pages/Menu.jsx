@@ -1,5 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import { useHistory } from "react-router-dom";
 // import { style } from '@material-ui/core/colors';
 
 const useStyles = makeStyles({
@@ -25,18 +26,28 @@ const useStyles = makeStyles({
 });
 
 const Menu = () => {
+    const history = useHistory();
+
     const classes = useStyles();
     const handleClickPlay = () => {
-        console.log('play cliked');
+        history.push('/play')
     }
     const handleClickCreate = () => {
-        console.log('create clicked');
+        history.push('/create')
     }
 
     return (
         <div className={classes.body}>
             <Button onClick={handleClickPlay} className={classes.button} >Play</Button>
             <Button onClick={handleClickCreate} className={classes.button}>Create</Button>
+            <Button className={classes.button} onClick={()=>{
+                const requestOptions = {
+                    method: 'POST'
+                };
+                  
+                  fetch(`/api/auth/logout`, requestOptions)
+                    .then(response => history.push(`/`))
+            }}>Logout</Button>
         </div>
     );
 }
