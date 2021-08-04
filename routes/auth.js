@@ -92,10 +92,10 @@ router.get(`/test`, (req, res) => {
     console.log(req.session)
 
     if (req.session.loggedIn){
-        res.send('Client is authorized!')
+        res.send(true)
     }
     else {
-        res.send('Client is not authorized!')
+        res.send(false)
     }
 })
 

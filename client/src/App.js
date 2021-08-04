@@ -11,6 +11,8 @@ import Music from "./pages/MusicScreen";
 import MusicScreen from "./pages/MusicScreen";
 import EditorScreen from "./pages/EditorScreen";
 import ViewingScreen from "./pages/ViewingScreen";
+import PlayScreen from "./pages/PlayScreen";
+import CreateScreen from "./pages/CreateScreen";
 
 const theme = createTheme({
   palette: {
@@ -39,6 +41,8 @@ function App() {
           <Route path="/music" exact component={MusicScreen} />
           <Route path="/editor/:id" exact component={EditorScreen} />
           <Route path="/view/:id" exact component={ViewingScreen} />
+          <Route path="/play" exact component = {PlayScreen} />
+          <Route path="/create" exact component = {CreateScreen} />
         </Switch>
       </Router>
     </ThemeProvider>

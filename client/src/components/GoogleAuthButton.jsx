@@ -1,74 +1,70 @@
-import React, {useEffect, useState} from 'react'
-import {GoogleLogin} from 'react-google-login';
-import axios from 'axios'
+import React, { useEffect, useState } from "react";
+import { GoogleLogin } from "react-google-login";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
+import { createTheme } from "@material-ui/core";
+import { ThemeProvider, Typography } from "@material-ui/core";
 
-const handleLogin = async googleData => {
-    const res = await fetch("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify({token: googleData.tokenId}),
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+const theme = createTheme({
+  palette: {
+    text:{
+      primary: "#ffffff"
+    }
   }
-  
-  function GoogleLog(props) {
-    return <GoogleLogin
+});
+
+const handleLogin = async (googleData, history) => {
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ token: googleData.tokenId }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  // Proceed only server returned 200 which confirms legal token
+  if (res.status === 200) {
+    history.push(`/menu`);
+    return;
+  }
+};
+
+function GoogleLog(props) {
+  return (
+    <GoogleLogin
+      clientId="244554015002-dq6ervkiinn5ocu3c0bkngrgnmtalfok.apps.googleusercontent.com"
+      buttonText="Log in with Google"
+      onSuccess={handleLogin}
+      onFailure={handleLogin}
+      cookiePolicy={"single_host_origin"}
+    />
+  );
+}
+
+function GoogleAuthButton() {
+  const history = useHistory();
+  const [auth, setAuth] = useState("Checking credentials...");
+
+  useEffect(() => {
+    axios.get("/api/auth/test").then((res) => {
+      console.log(res.data);
+      if (res.data === true) {
+        history.push(`/menu`);
+      } else {
+        setAuth(
+          <GoogleLogin
             clientId="244554015002-dq6ervkiinn5ocu3c0bkngrgnmtalfok.apps.googleusercontent.com"
             buttonText="Log in with Google"
-            onSuccess={handleLogin}
-            onFailure={handleLogin}
-            cookiePolicy={'single_host_origin'}
-    />;
-  }
-  
-  const authCheck = async auth => {
-    const res = await fetch("/api/auth/test", {
-      method: "POST",
-      body: "",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      credentials: 'include'
-     });
-  
-    const data = await res.json();
-    console.log(data);
-  
-    if (data === true) {
-      return <button onClick="handleLogout()">Log out</button>;
-    }
-    else {
-      return <GoogleLog />;
-    }
-  }
-  
-  function GoogleAuthButton() {
-    useEffect(() => {
+            onSuccess={async (data) => handleLogin(data, history)}
+            onFailure={async (data) => handleLogin(data, history)}
+            cookiePolicy={"single_host_origin"}
+          />
+        );
+      }
+    });
+  }, []);
 
-      axios.get('/api/auth/test').then(res => {
-        console.log(res.data)
-        if (res.data === true) {
-          setAuth(<button onClick="handleLogout()">Log out</button>)
-        }
-        else {
-          setAuth(<GoogleLog/>);
-        }
-      }) 
-      }, [])
-  
-    const [auth, setAuth] = useState('');
-    const [state, setState] = useState('')
-    
-  
-  
-    return (
-      <div>
-          <p>{auth}</p>
-          <p>Server call (v.6): {state}</p>
-      </div>
-    );
-  }
-  
-  export default GoogleAuthButton;
-  
+  return <ThemeProvider theme={theme}><Typography component={'div'} color="textPrimary"><div>{auth}</div></Typography></ThemeProvider>;
+}
+
+export default GoogleAuthButton;
