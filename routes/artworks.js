@@ -114,7 +114,7 @@ router.post(`/save`, async (req, res) => {
 })
 
 //downloads the artwork data.
-router.get(`/artwork/:artwork`, async (req, res) => {
+router.get(`/:artwork`, async (req, res) => {
     if (!_assertAPIAuthorized(req)){
         res.status(401).send('Not authorized')
         return
@@ -130,7 +130,10 @@ router.get(`/artwork/:artwork`, async (req, res) => {
     }
 
     const bitmap = await uploader.downloadArtwork(artworkId)
-    res.send(bitmap)
+    const artworkMeta = await DB.GetArtwork(artworkId)
+
+    const response = {meta: artworkMeta, bitmap: bitmap}
+    res.send(response)
 })
 
 module.exports = router

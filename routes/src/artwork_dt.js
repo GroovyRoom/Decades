@@ -20,12 +20,25 @@ module.exports = class Artwork {
         return artworkObjects
     }
 
-    static generateWhiteBitmap(width, length) {
+    static generateWhiteBitmap(width, height) {
         let bitmap = []
-        for (let i = 0; i<length; i++){
+        for (let i = 0; i<height; i++){
             for (let j = 0; j<width; j++){
                 bitmap.push(255);
                 bitmap.push(255);
+                bitmap.push(255);
+            }
+        }
+
+        return bitmap
+    }
+
+    static generateBlueBitmap(width, height){
+        let bitmap = []
+        for (let i = 0; i<height; i++){
+            for (let j = 0; j<width; j++){
+                bitmap.push(0);
+                bitmap.push(0);
                 bitmap.push(255);
             }
         }

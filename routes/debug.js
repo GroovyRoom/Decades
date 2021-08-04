@@ -29,8 +29,8 @@ router.post(`/reset/:amount`, async (req, res) => {
     // 3. Generate random artworks
     const randomArtworks = Artwork.generateRandomArtworks(req.params.amount)
 
-    // 4. Generate a white bitmap for all these test artworks
-    const whiteBitmap = Artwork.generateWhiteBitmap(640, 640)
+    // 4. Generate a blue bitmap for all these test artworks
+    const whiteBitmap = Artwork.generateBlueBitmap(640, 640)
 
     // 5. For each artwork: first, create entry in the database. 
     // When that is done, then upload a bitmap to the storage
@@ -45,6 +45,18 @@ router.post(`/reset/:amount`, async (req, res) => {
     console.log(`Done!`)
 
     res.json(resultArtworks)
+})
+
+//downloads the artwork data.
+router.get(`/:artwork`, async (req, res) => {
+    // Artwork id is guaranteed to be there by construction
+    const artworkId = req.params.artwork
+
+    const bitmap = await uploader.downloadArtwork(artworkId)
+    const artworkMeta = await DB.GetArtwork(artworkId)
+
+    const response = {meta: artworkMeta, bitmap: bitmap}
+    res.send(response)
 })
 
 module.exports = router

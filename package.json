@@ -9,7 +9,8 @@
     "dev-client": "npm --prefix ./client/ run start",
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
     "build": "node build_decades.js",
-    "test": "npm --prefix ./client/ run build && npm run dev-server"
+    "test": "npm --prefix ./client/ run build && npm run dev-server",
+    "deploy": "gcloud --quiet app deploy deployment/app.yaml"
   },
   "dependencies": {
     "@google-cloud/firestore": "^4.13.2",

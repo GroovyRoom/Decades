@@ -51,7 +51,30 @@ router.post('/login2/:name', async (req, res) => {
     res.status(200).send(`Successfully logged in! User name is ${req.session.userId}`)
 })
 
+router.get('/login2/:name', async (req, res) => {
+    if (req.session.userId){
+        res.status(200).send(`Already logged in, the user id is ${req.session.userId}`)
+        return 
+    }
+
+    req.session.loggedIn = true;
+    req.session.userId = req.params.name;
+    res.status(200).send(`Successfully logged in! User name is ${req.session.userId}`)
+})
+
 router.post('/logout', async (req, res) => {
+    req.session.destroy((err) => {
+        if (err){
+            console.error(err)
+            res.status(401).send('Failed to logout')
+            return
+        }
+
+        res.status(200).send('Logged out.')
+    })
+})
+
+router.get('/logout', async (req, res) => {
     req.session.destroy((err) => {
         if (err){
             console.error(err)
