@@ -35,11 +35,13 @@ const downloadArtwork = async (artworkId) => {
     }
 
     const data = await remoteArtworkFile.download()
+    /*
     const contents = data[0]
     let bitmap32 = new Int32Array(contents)
     let bitmap = []
     bitmap = [...bitmap, ...bitmap32]
-    return bitmap
+    */
+    return data
 }
 
 const clearStore = async() => {

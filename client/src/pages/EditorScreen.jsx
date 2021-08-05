@@ -12,6 +12,7 @@ import { createTheme } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";
 import { ChromePicker, SketchPicker } from 'react-color';
+import Pako from 'pako'
 
 const theme = createTheme({
   palette: {
@@ -64,9 +65,8 @@ const _save = (id, history, isPublic = false) => {
     requestData.meta.public = true;
   }
 
-  requestData.bitmap = bitmap;
-
-  console.log(requestData);
+  
+  requestData.meta.bitmap = Pako.deflate(bitmap, {to: 'string'});
 
   const requestOptions = {
     method: "POST",
@@ -75,8 +75,8 @@ const _save = (id, history, isPublic = false) => {
   };
 
   fetch(`/api/artworks/save`, requestOptions)
-    .then((response) => response.json())
-    .then((response) => history.push(`/editor/${response.id}`));
+  .then((response) => response.json())
+  .then((response) => history.push(`/editor/${response.id}`));
 };
 
 const EditorScreen = () => {
@@ -97,8 +97,9 @@ const EditorScreen = () => {
       fetch(`/api/debug/${id}`)
         .then((response) => response.json())
         .then((result) => {
-          setArtworkData(result);
-        });
+            result.bitmap = Pako.inflate(result.meta.bitmap);
+            setArtworkData(result);
+        })
     }
   }, []);
 

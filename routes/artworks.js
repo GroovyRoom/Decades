@@ -100,15 +100,17 @@ router.post(`/save`, async (req, res) => {
     //update DB
     const dbEntry = await DB.UpdateArtwork(req.body.meta)
 
-    //client always supplies the bitmap when saving.
-    //if nothing is supplied, then a white bitmap is submitted. This should never happen though.
-    let bitmap = req.body.bitmap
-    if (bitmap === null || bitmap === undefined){
-        bitmap = Artwork.generateWhiteBitmap(640, 640)
-    }
+    // //client always supplies the bitmap when saving.
+    // //if nothing is supplied, then a white bitmap is submitted. This should never happen though.
+    // let bitmap = req.body.bitmap
+    // if (bitmap === null || bitmap === undefined){
+    //     bitmap = Artwork.generateWhiteBitmap(640, 640)
+    // }
 
-    //TODO: validate size! Must always have 640x640x3 entries
-    await uploader.uploadArtwork(dbEntry.id, bitmap)
+    // //TODO: validate size! Must always have 640x640x3 entries
+    // console.log(`uploading bitmap..`)
+    // console.log(bitmap)
+    // await uploader.uploadArtwork(dbEntry.id, bitmap)
 
     res.json(dbEntry)
 })
@@ -129,10 +131,10 @@ router.get(`/:artwork`, async (req, res) => {
         return
     }
 
-    const bitmap = await uploader.downloadArtwork(artworkId)
+    // const bitmap = await uploader.downloadArtwork(artworkId)
     const artworkMeta = await DB.GetArtwork(artworkId)
 
-    const response = {meta: artworkMeta, bitmap: bitmap}
+    const response = {meta: artworkMeta}
     res.send(response)
 })
 
