@@ -170,7 +170,7 @@ const Canvas = (props) => {
     if (props.bitmap == null) {
       bitmap = _generateWhiteBitmap();
     } else {
-      bitmap = _convertToClientBitmap(props.bitmap);
+      bitmap = props.bitmap
     }
 
     // render the bitmap
