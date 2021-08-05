@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Canvas from "../components/Canvas";
 import {
@@ -6,10 +6,12 @@ import {
   TextField,
   ThemeProvider,
   Typography,
+  Slider,
 } from "@material-ui/core";
 import { createTheme } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";
+import { ChromePicker, SketchPicker } from 'react-color';
 
 const theme = createTheme({
   palette: {
@@ -58,8 +60,8 @@ const _save = (id, history, isPublic = false) => {
     requestData.meta.id = id;
   }
 
-  if (isPublic){
-    requestData.meta.public = true
+  if (isPublic) {
+    requestData.meta.public = true;
   }
 
   requestData.bitmap = bitmap;
@@ -80,6 +82,8 @@ const _save = (id, history, isPublic = false) => {
 const EditorScreen = () => {
   const { id } = useParams();
   const [artworkData, setArtworkData] = useState(null);
+  const [drawThickness, setDrawThickness] = useState(8)
+  const [drawColor, setDrawColor] = useState({r: 0, g:0, b:255, a:255})
   const history = useHistory();
 
   // use effect runs only once on component startup
@@ -111,7 +115,28 @@ const EditorScreen = () => {
       <ThemeProvider theme={theme}>
         <Typography component={"fieldset"} color="textPrimary">
           <div>
-            <Canvas bitmap={artworkData.bitmap}></Canvas>
+            <Canvas
+              id = "drawing_board"
+              bitmap={artworkData.bitmap}
+              color={{r: drawColor.r, g: drawColor.g, b: drawColor.b, a: drawColor.a*255.0}}
+              thickness={drawThickness}
+            ></Canvas>
+            <Typography>Brush Size</Typography>
+            <Slider
+              id = "thickness_slider"
+              defaultValue={8.0}
+              aria-labelledby="discrete-slider"
+              valueLabelDisplay="auto"
+              step={1}
+              min={8}
+              max={100}
+              onChange={(event, val)=>{
+                setDrawThickness(val)
+              }}
+            ></Slider>
+            <ChromePicker color={drawColor} onChange={(color, event) => {
+              setDrawColor(color.rgb)
+            }}></ChromePicker>
             <CssTextField
               id="name_field"
               label="Name"
@@ -124,14 +149,20 @@ const EditorScreen = () => {
               variant="outlined"
               defaultValue={artworkData.meta.songId}
             ></CssTextField>
-            <Button variant="contained" onClick={() => {
-              _save(id, history, false)
-            }}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                _save(id, history, false);
+              }}
+            >
               Save
             </Button>
-            <Button variant="contained" onClick={() => {
-              _save(id, history, true)
-            }}>
+            <Button
+              variant="contained"
+              onClick={() => {
+                _save(id, history, true);
+              }}
+            >
               Upload
             </Button>
           </div>

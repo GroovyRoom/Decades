@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: false, limit: '50mb'}));
 app.use(session({store: new FirestoreStore({
   dataset: FirestoreClient.firestore,
   kind: "sessions"
-}), secret: 'cat', saveUninitialized: true, resave: false, cookie: {maxAge: 1000*60*30}}));
+}), secret: 'cat', saveUninitialized: true, resave: false, cookie: {maxAge: 1000*60*60}}));
 
 // Locally we will serve that build/ directory here
 // When app is deployed, GAE sets that variable to "production"
