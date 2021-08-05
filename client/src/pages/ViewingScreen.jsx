@@ -6,6 +6,7 @@ import { createTheme } from "@material-ui/core";
 import { withStyles } from "@material-ui/core/styles";
 import SoundCloud from "../components/SoundCloud"
 import { makeStyles } from "@material-ui/core/styles";
+import Game from "../components/Game";
 
 const theme = createTheme({
   palette: {
@@ -87,7 +88,12 @@ const ViewingScreen = () => {
     return <ThemeProvider theme={theme}><Typography component={'div'} color="textPrimary"><div>Loading, please wait...</div></Typography></ThemeProvider>
   } else {
     return <ThemeProvider theme={theme}><Typography component={'fieldset'} color="textPrimary"><div>
-      <Canvas bitmap={artworkData.bitmap} disallowDraw={true}></Canvas>
+
+      <div id="game_background">
+        <Canvas bitmap={artworkData.bitmap} disallowDraw={true}></Canvas>
+        <Game></Game>
+      </div>
+      
       <p>{`Artwork: ${artworkData.meta.name} by ${artworkData.meta.user}`}</p>
       <p>{`Music: ${artworkData.meta.songId}`}</p>
       <div className={classes.rootHolder}>
