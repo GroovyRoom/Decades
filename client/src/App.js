@@ -13,6 +13,7 @@ import EditorScreen from "./pages/EditorScreen";
 import ViewingScreen from "./pages/ViewingScreen";
 import PlayScreen from "./pages/PlayScreen";
 import CreateScreen from "./pages/CreateScreen";
+import GameScreen from "./pages/GameScreen";
 
 const theme = createTheme({
   palette: {
@@ -43,6 +44,7 @@ function App() {
           <Route path="/view/:id" exact component={ViewingScreen} />
           <Route path="/play" exact component = {PlayScreen} />
           <Route path="/create" exact component = {CreateScreen} />
+          <Route path="/game" exact component = {GameScreen} />
         </Switch>
       </Router>
     </ThemeProvider>
