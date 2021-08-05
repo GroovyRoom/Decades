@@ -1,7 +1,7 @@
 import React from "react";
 import axios from 'axios';
 import Login from "./pages/Login";
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch, Redirect, Link } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Logo from "./components/Logo";
@@ -102,7 +102,9 @@ class App extends React.Component {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          <Logo />
+          <Link to="/menu">
+            <Logo />
+          </Link>
           <Switch>
                 {this.state.login}
                 {this.state.menu}
