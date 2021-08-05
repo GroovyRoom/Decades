@@ -25,7 +25,7 @@ const useStyles = makeStyles({
     },
 });
 
-const Menu = () => {
+const Menu = (props) => {
     const history = useHistory();
 
     const classes = useStyles();
@@ -46,7 +46,7 @@ const Menu = () => {
                 };
                   
                   fetch(`/api/auth/logout`, requestOptions)
-                    .then(response => history.push(`/`))
+                    .then(response => props.logoutHandler())
             }}>Logout</Button>
         </div>
     );

@@ -13,7 +13,7 @@ const theme = createTheme({
   }
 });
 
-const handleLogin = async (googleData, history) => {
+const handleLogin = async (googleData, callback) => {
   const res = await fetch("/api/auth/login", {
     method: "POST",
     body: JSON.stringify({ token: googleData.tokenId }),
@@ -24,8 +24,7 @@ const handleLogin = async (googleData, history) => {
 
   // Proceed only server returned 200 which confirms legal token
   if (res.status === 200) {
-    history.push(`/menu`);
-    return;
+    callback(true);
   }
 };
 
@@ -41,28 +40,20 @@ function GoogleLog(props) {
   );
 }
 
-function GoogleAuthButton() {
+function GoogleAuthButton(props) {
   const history = useHistory();
   const [auth, setAuth] = useState("Checking credentials...");
 
   useEffect(() => {
-    axios.get("/api/auth/test").then((res) => {
-      console.log(res.data);
-      if (res.data === true) {
-        history.push(`/menu`);
-      } else {
-        setAuth(
-          <GoogleLogin
-            clientId="244554015002-dq6ervkiinn5ocu3c0bkngrgnmtalfok.apps.googleusercontent.com"
-            buttonText="Log in with Google"
-            onSuccess={async (data) => handleLogin(data, history)}
-            onFailure={async (data) => handleLogin(data, history)}
-            cookiePolicy={"single_host_origin"}
-          />
-        );
-      }
-    });
-  }, []);
+    setAuth(
+      <GoogleLogin
+        clientId="244554015002-dq6ervkiinn5ocu3c0bkngrgnmtalfok.apps.googleusercontent.com"
+        buttonText="Log in with Google"
+        onSuccess={async (data) => handleLogin(data, (status) => props.authHandler())}
+        onFailure={async (data) => handleLogin(data, (status) => props.authHandler())}
+        cookiePolicy={"single_host_origin"}
+      />
+        );}, []);
 
   return <ThemeProvider theme={theme}><Typography component={'div'} color="textPrimary"><div>{auth}</div></Typography></ThemeProvider>;
 }

@@ -89,7 +89,7 @@ router.get('/logout', async (req, res) => {
 
 
 router.get(`/test`, (req, res) => {
-    console.log(req.session)
+    //console.log(req.session)
 
     if (req.session.loggedIn){
         res.send(true)

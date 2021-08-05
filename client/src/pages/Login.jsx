@@ -33,7 +33,7 @@ const useStyles = makeStyles({
   }
 });
 
-const LogIn = () => {
+const LogIn = (props) => {
   const classes = useStyles();
 
   function handleClick(e) {
@@ -47,7 +47,7 @@ const LogIn = () => {
           <Typography className={classes.title} variant="h5" component="h2">
             Log in to Decades
           </Typography>
-          <GoogleAuthButton />
+          <GoogleAuthButton authHandler={props.authHandler}/>
         </CardContent>
       </Card>
     </div>
