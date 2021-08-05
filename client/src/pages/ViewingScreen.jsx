@@ -1,23 +1,30 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {useParams} from "react-router-dom"
 import Canvas from "../components/Canvas";
-import { Button, TextField, ThemeProvider, Typography } from "@material-ui/core";
-import { createTheme } from "@material-ui/core";
-import { withStyles } from "@material-ui/core/styles";
+import { 
+  Button, 
+  Typography, 
+  Paper,
+  Dialog, 
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Slide,
+  Card, 
+  CardActions
+ } from "@material-ui/core";
 import SoundCloud from "../components/SoundCloud"
 import { makeStyles } from "@material-ui/core/styles";
 import Game from "../components/Game";
 import Pako from 'pako'
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import IconButton from '@material-ui/core/IconButton';
+import PauseCircleOutlineIcon from '@material-ui/icons/PauseCircleOutline';
 
-const theme = createTheme({
-  palette: {
-    text:{
-      primary: "#ffffff"
-    }
-  }
-});
 
-const useStyles = makeStyles({
+
+const useStyles = makeStyles(({ spacing, palette }) => ({
   rootHolder: {
     minWidth: 260,
     maxWidth: 330,
@@ -48,33 +55,57 @@ const useStyles = makeStyles({
     border: "none",
     color: "rgb(10, 31, 27)",
     "font-size": "1.6em"
-  }
-});
-
-const CssTextField = withStyles({
-  root: {
-    '& label': {
-      color: 'grey',
-    },
-    '& label.Mui-focused': {
-      color: 'white',
-    },
-    '& .MuiInput-underline:after': {
-      borderBottomColor: 'white',
-    },
-    '& fieldset': {
-      borderColor: 'white',
-    }
   },
-})(TextField);
+  loading: { 
+    color: '#fff',
+    display: 'flex',
+    justifyContent: 'center'
+  },
+  canvas: {
+    display: 'flex',
+    justifyContent: 'center',
+    backgroundColor: '#0A1F1B',
+    margin: spacing(2)
+  },
+  textArtworkField: {
+    display: 'flex',
+    justifyContent: 'center',
+    color: "#66FCA6"
+  },
+  buttonInfo: {
+    margin: spacing(2),
+  },
+  cardInfo: { 
+    maxWidth: 300,
+    backgroundColor: '#0A1F1B',
+    marginLeft: '38%'
+  }
+}));
+
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const ViewingScreen = () => {
   const classes = useStyles();
 
   const { id } = useParams();
   const [artworkData, setArtworkData] = useState(null)
-  const [toggle, setToggle] = useState(-1);
+  const [toggle, setToggle] = useState(-1); //set to -1
+  const [open, setOpen] = useState(false);
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  useEffect(() => { 
+
+  })
   // use effect runs only once on component startup
   useEffect(() => {
     fetch(`/api/debug/${id}`)
@@ -87,33 +118,76 @@ const ViewingScreen = () => {
   }, [])
 
   if (artworkData == null){
-    return <ThemeProvider theme={theme}><Typography component={'div'} color="textPrimary"><div>Loading, please wait...</div></Typography></ThemeProvider>
-  } else {
-    return <ThemeProvider theme={theme}><Typography component={'fieldset'} color="textPrimary"><div>
-
-      <div id="game_background">
-        <Canvas bitmap={artworkData.bitmap} disallowDraw={true}></Canvas>
-        <Game></Game>
+    return (
+      <div className={classes.loading}>
+        <h2> Loading, please wait... </h2>
       </div>
-      
-      <p>{`Artwork: ${artworkData.meta.name} by ${artworkData.meta.user}`}</p>
-      <p>{`Music: ${artworkData.meta.songId}`}</p>
-      <div className={classes.rootHolder}>
-        <SoundCloud
+    );
+  } else {
+    return (
+      <div>
+        <Paper className={classes.canvas}>
+          <div id='game_background'>
+            <Canvas bitmap={artworkData.bitmap} disallowDraw={true}></Canvas>
+            <Game></Game>
+          </div>
+        </Paper>
+        <Card className={classes.cardInfo}>
+          <CardActions>
+            <Button
+              variant='outlined'
+              color='primary'
+              onClick={handleClickOpen}
+              className={classes.buttonInfo}
+            >
+              Artwork Info
+            </Button>
+            <SoundCloud
             url={`https://soundcloud.com/${artworkData.meta.songId}`}
             status={toggle}
-        />
-        <button className={classes.playbutton} onClick={() => {
-            setToggle(1)
-          }
-        }>▶</button>
-        <button className={classes.pauseButton} onClick={() => {
-            setToggle(0)
-          }
-        }>❚❚</button>
-    </div>
-      </div></Typography></ThemeProvider>
-  }
+          />
+          <IconButton
+            onClick={() => {
+              setToggle(1);
+            }}
+            color='primary'
+          >
+            <PlayCircleOutlineIcon />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              setToggle(0);
+            }}
+            color='primary'
+          >
+            <PauseCircleOutlineIcon />
+          </IconButton>
+          </CardActions>
+        </Card>
+
+        <Dialog
+          open={open}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={handleClose}
+          aria-labelledby='alert-dialog-slide-title'
+          aria-describedby='alert-dialog-slide-description'
+        >
+          <DialogTitle id='alert-dialog-slide-title'>{`Artwork: ${artworkData.meta.name}`}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id='alert-dialog-slide-description'>
+              <Typography>Created by user: ${artworkData.meta.user}</Typography>
+              <Typography>Music: ${artworkData.meta.songId}</Typography>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color='#000'>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    );}
 };
 
 export default ViewingScreen;

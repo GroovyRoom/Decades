@@ -15,10 +15,10 @@ import CreateScreen from "./pages/CreateScreen";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#000",
+      main: "#66FCA6",
     },
     secondary: {
-      main: "#000",
+      main: "#FFF",
     },
     background: {
       default: "#0A1F1B",

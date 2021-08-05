@@ -52,6 +52,7 @@ const _save = (id, history, isPublic = false) => {
     bitmap.push(imageData.data[i]);
     bitmap.push(imageData.data[i + 1]);
     bitmap.push(imageData.data[i + 2]);
+    bitmap.push(imageData.data[i + 3]);
   }
 
   let requestData = { meta: {}, bitmap: [] };
