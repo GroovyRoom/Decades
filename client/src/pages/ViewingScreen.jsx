@@ -7,6 +7,7 @@ import { withStyles } from "@material-ui/core/styles";
 import SoundCloud from "../components/SoundCloud"
 import { makeStyles } from "@material-ui/core/styles";
 import Game from "../components/Game";
+import Pako from 'pako'
 
 const theme = createTheme({
   palette: {
@@ -79,6 +80,7 @@ const ViewingScreen = () => {
     fetch(`/api/debug/${id}`)
       .then(response => response.json())
       .then(result => {
+        result.bitmap = Pako.inflate(result.meta.bitmap);
         setArtworkData(result)
       })
     
