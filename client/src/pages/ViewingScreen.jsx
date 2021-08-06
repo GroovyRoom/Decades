@@ -120,7 +120,7 @@ const ViewingScreen = () => {
   if (artworkData == null){
     return (
       <div className={classes.loading}>
-        <h2> Loading, please wait... </h2>
+        <h2>Loading, please wait...</h2>
       </div>
     );
   } else {

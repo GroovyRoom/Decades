@@ -42,7 +42,7 @@ const CssTextField = withStyles({
   },
 })(TextField);
 
-const _save = (id, history, isPublic = false) => {
+const _save = (id, history, uploadingStateSetter, isPublic = false) => {
   //TODO: well, we could just find canvas on the page and get its frame data... dirty, but could work
 
   const canvas = document.getElementsByTagName("canvas")[0];
@@ -78,9 +78,14 @@ const _save = (id, history, isPublic = false) => {
     body: JSON.stringify(requestData),
   };
 
+  uploadingStateSetter(1)
+
   fetch(`/api/artworks/save`, requestOptions)
     .then((response) => response.json())
-    .then((response) => history.push(`/editor/${response.id}`));
+    .then((response) => {
+      uploadingStateSetter(2)
+      history.push(`/editor/${response.id}`)
+    });
 };
 
 const useStyles = makeStyles({
@@ -112,6 +117,21 @@ const useStyles = makeStyles({
     color: 'white'
   },
 
+  readyStatusText: {
+    color: 'white',
+    marginLeft: 50
+  },
+
+  uploadingStatusText: {
+    color: '#C3F4FD',
+    marginLeft: 50
+  },
+
+  uploadedStatusText: {
+    color: '#91F8AD',
+    marginLeft: 50
+  },
+
   button: {
     backgroundColor: '#B7F6FF',
     borderRadius: 36,
@@ -138,6 +158,12 @@ const useStyles = makeStyles({
     background: '#0A1F1B',
     color: 'white',
   },
+
+  loading: { 
+    color: '#fff',
+    display: 'flex',
+    justifyContent: 'center'
+  }
 })
 
 const EditorScreen = () => {
@@ -148,6 +174,9 @@ const EditorScreen = () => {
   const history = useHistory();
   const classes = useStyles();
 
+  // 0 - fresh, 1 - uploading, 2 - successfully uploaded
+  const [uploadingState, setUploadingState] = useState(0)
+
   // use effect runs only once on component startup
   useEffect(() => {
     if (id === "new") {
@@ -156,7 +185,7 @@ const EditorScreen = () => {
       freshArtwork.meta.songId = "bringerss/beneath-the-mask-rain-extended";
       setArtworkData(freshArtwork);
     } else {
-      fetch(`/api/debug/${id}`)
+      fetch(`/api/artworks/${id}`)
         .then((response) => response.json())
         .then((result) => {
           result.bitmap = Pako.inflate(result.meta.bitmap);
@@ -167,11 +196,9 @@ const EditorScreen = () => {
 
   if (artworkData == null) {
     return (
-      <ThemeProvider theme={theme}>
-        <Typography component={"div"} color="textPrimary">
-          <div>Loading, please wait...</div>
-        </Typography>
-      </ThemeProvider>
+      <div className={classes.loading}>
+          <h2>Loading, please wait...</h2>
+      </div>
     );
   } else {
     return (
@@ -233,20 +260,24 @@ const EditorScreen = () => {
               />
             </Box>
           </Container>
-
+          {uploadingState === 0 ? <Typography className={classes.readyStatusText}>Ready to be saved or uploaded.</Typography> : null}
+          {uploadingState === 1 ? <Typography className={classes.uploadingStatusText}>Uploading, please wait...</Typography> : null}
+          {uploadingState === 2 ? <Typography className={classes.uploadedStatusText}>Successfully uploaded!</Typography> : null}
           <Container className={classes.buttons}>
             <Button className={classes.button}
               variant="contained"
+              disabled={uploadingState === 1}
               onClick={() => {
-                _save(id, history, false);
+                _save(id, history, setUploadingState, false);
               }}
             >
               Save
             </Button>
             <Button className={classes.button}
+            disabled={uploadingState === 1}
               variant="contained"
               onClick={() => {
-                _save(id, history, true);
+                _save(id, history, setUploadingState, true);
               }}
             >
               Upload
