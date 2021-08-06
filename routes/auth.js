@@ -2,8 +2,7 @@ const express = require(`express`)
 const {OAuth2Client} = require('google-auth-library');
 const DB = require(`./src/db_firebase`)
 
-//TODO: Testing App. Need to make a proper App.
-const clientID = "244554015002-dq6ervkiinn5ocu3c0bkngrgnmtalfok.apps.googleusercontent.com";
+const clientID = "346842459589-sagihg3judk9nvnbunr0j9tfvukqgeuc.apps.googleusercontent.com";
 
 const router = express.Router()
 const oauth = new OAuth2Client(clientID);

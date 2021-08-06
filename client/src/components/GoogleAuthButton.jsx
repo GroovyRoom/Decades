@@ -31,7 +31,7 @@ const handleLogin = async (googleData, callback) => {
 function GoogleLog(props) {
   return (
     <GoogleLogin
-      clientId="244554015002-dq6ervkiinn5ocu3c0bkngrgnmtalfok.apps.googleusercontent.com"
+      clientId="346842459589-sagihg3judk9nvnbunr0j9tfvukqgeuc.apps.googleusercontent.com"
       buttonText="Log in with Google"
       onSuccess={handleLogin}
       onFailure={handleLogin}
@@ -47,7 +47,7 @@ function GoogleAuthButton(props) {
   useEffect(() => {
     setAuth(
       <GoogleLogin
-        clientId="244554015002-dq6ervkiinn5ocu3c0bkngrgnmtalfok.apps.googleusercontent.com"
+        clientId="346842459589-sagihg3judk9nvnbunr0j9tfvukqgeuc.apps.googleusercontent.com"
         buttonText="Log in with Google"
         onSuccess={async (data) => handleLogin(data, (status) => props.authHandler())}
         onFailure={async (data) => handleLogin(data, (status) => props.authHandler())}
