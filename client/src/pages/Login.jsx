@@ -10,10 +10,9 @@ import GoogleAuthButton from '../components/GoogleAuthButton'
 
 const useStyles = makeStyles({
   rootHolder: {
-    minWidth: 260,
-    maxWidth: 330,
-    marginTop: "100px",
-    marginLeft: "470px",
+    marginTop: 320,
+    display: 'flex',
+    justifyContent: 'center',
     padding: "0 10px",
     boxSizing: "border-box",
   },
@@ -25,11 +24,11 @@ const useStyles = makeStyles({
     color: '#fff'
   },
 
-  card: { 
-      background: '#0A1F1B',
-      borderStyle:'solid',
-      borderWidth:'0.3px',
-      borderColor:'#66FCA6',
+  card: {
+    background: '#0A1F1B',
+    borderStyle: 'solid',
+    borderWidth: '0.3px',
+    borderColor: '#66FCA6',
   }
 });
 
@@ -43,7 +42,7 @@ const LogIn = (props) => {
   return (
     <div className={classes.rootHolder}>
       <Card className={classes.card}>
-        <CardContent  align='center'>
+        <CardContent align='center'>
           <Typography className={classes.title} variant="h5" component="h2">
             Log in to Decades
           </Typography>

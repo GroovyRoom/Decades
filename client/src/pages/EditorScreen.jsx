@@ -7,8 +7,11 @@ import {
   ThemeProvider,
   Typography,
   Slider,
+  Container,
+  Box
 } from "@material-ui/core";
 import { createTheme } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import { withStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";
 import { ChromePicker, SketchPicker } from 'react-color';
@@ -66,8 +69,8 @@ const _save = (id, history, isPublic = false) => {
     requestData.meta.public = true;
   }
 
-  
-  requestData.meta.bitmap = Pako.deflate(bitmap, {to: 'string'});
+
+  requestData.meta.bitmap = Pako.deflate(bitmap, { to: 'string' });
 
   const requestOptions = {
     method: "POST",
@@ -76,16 +79,74 @@ const _save = (id, history, isPublic = false) => {
   };
 
   fetch(`/api/artworks/save`, requestOptions)
-  .then((response) => response.json())
-  .then((response) => history.push(`/editor/${response.id}`));
+    .then((response) => response.json())
+    .then((response) => history.push(`/editor/${response.id}`));
 };
+
+const useStyles = makeStyles({
+  body: {
+    marginTop: 50,
+    marginLeft: 100,
+    marginRight: 100,
+    display: 'flex',
+    justifyContent: 'space-around',
+  },
+
+  tools: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignContent: 'space-between',
+  },
+
+  colors: {
+    display: 'flex',
+    justifyContent: 'center'
+  },
+
+  buttons: {
+    display: 'flex',
+    justifyContent: 'space-around'
+  },
+
+  text: {
+    color: 'white'
+  },
+
+  button: {
+    backgroundColor: '#B7F6FF',
+    borderRadius: 36,
+    fontSize: 24,
+    maxWidth: 160,
+    padding: '14px 160px',
+    "&:hover": {
+      backgroundColor: '#B7F6FF',
+      boxShadow: '0 8px 16px 0 #626262, 0 6px 20px 0 #626262'
+    }
+  },
+
+  field: {
+    background: '#0A1F1B',
+  },
+
+  label: {
+    background: '#0A1F1B',
+    color: 'white',
+  },
+
+  name: {
+    border: '2px solid white',
+    background: '#0A1F1B',
+    color: 'white',
+  },
+})
 
 const EditorScreen = () => {
   const { id } = useParams();
   const [artworkData, setArtworkData] = useState(null);
   const [drawThickness, setDrawThickness] = useState(8)
-  const [drawColor, setDrawColor] = useState({r: 0, g:0, b:255, a:255})
+  const [drawColor, setDrawColor] = useState({ r: 0, g: 0, b: 255, a: 255 })
   const history = useHistory();
+  const classes = useStyles();
 
   // use effect runs only once on component startup
   useEffect(() => {
@@ -98,8 +159,8 @@ const EditorScreen = () => {
       fetch(`/api/debug/${id}`)
         .then((response) => response.json())
         .then((result) => {
-            result.bitmap = Pako.inflate(result.meta.bitmap);
-            setArtworkData(result);
+          result.bitmap = Pako.inflate(result.meta.bitmap);
+          setArtworkData(result);
         })
     }
   }, []);
@@ -114,44 +175,67 @@ const EditorScreen = () => {
     );
   } else {
     return (
-      <ThemeProvider theme={theme}>
-        <Typography component={"fieldset"} color="textPrimary">
-          <div>
-            <Canvas
-              id = "drawing_board"
-              bitmap={artworkData.bitmap}
-              color={{r: drawColor.r, g: drawColor.g, b: drawColor.b, a: drawColor.a*255.0}}
-              thickness={drawThickness}
-            ></Canvas>
-            <Typography>Brush Size</Typography>
-            <Slider
-              id = "thickness_slider"
+      <div className={classes.body}>
+        <Canvas
+          id="drawing_board"
+          bitmap={artworkData.bitmap}
+          color={{ r: drawColor.r, g: drawColor.g, b: drawColor.b, a: drawColor.a * 255.0 }}
+          thickness={drawThickness}
+        ></Canvas>
+        <div className={classes.tools}>
+          <Container>
+            <h3 className={classes.text}>Brush Size</h3>
+            <Slider className={classes.text}
+              id="thickness_slider"
               defaultValue={8.0}
               aria-labelledby="discrete-slider"
               valueLabelDisplay="auto"
               step={1}
               min={8}
               max={100}
-              onChange={(event, val)=>{
+              onChange={(event, val) => {
                 setDrawThickness(val)
               }}
             ></Slider>
-            <ChromePicker color={drawColor} onChange={(color, event) => {
-              setDrawColor(color.rgb)
-            }}></ChromePicker>
-            <CssTextField
-              id="name_field"
-              label="Name"
-              variant="outlined"
-              defaultValue={artworkData.meta.name}
-            ></CssTextField>
-            <CssTextField
-              id="song_field"
-              label="Song"
-              variant="outlined"
-              defaultValue={artworkData.meta.songId}
-            ></CssTextField>
-            <Button
+          </Container>
+          <Container className={classes.colors}>
+            <Container>
+              <ChromePicker color={drawColor} onChange={(color, event) => {
+                setDrawColor(color.rgb)
+              }}></ChromePicker>
+            </Container>
+            <Box className={classes.buttons}>
+              <TextField
+                className={classes.field}
+                id="name_field"
+                label="Name"
+                variant="outlined"
+                defaultValue={artworkData.meta.name}
+                InputLabelProps={{
+                  className: classes.label,
+                }}
+                InputProps={{
+                  className: classes.name,
+                }}
+              />
+              <TextField
+                className={classes.field}
+                id="song_field"
+                label="Song"
+                variant="outlined"
+                defaultValue={artworkData.meta.songId}
+                InputLabelProps={{
+                  className: classes.label,
+                }}
+                InputProps={{
+                  className: classes.name,
+                }}
+              />
+            </Box>
+          </Container>
+
+          <Container className={classes.buttons}>
+            <Button className={classes.button}
               variant="contained"
               onClick={() => {
                 _save(id, history, false);
@@ -159,7 +243,7 @@ const EditorScreen = () => {
             >
               Save
             </Button>
-            <Button
+            <Button className={classes.button}
               variant="contained"
               onClick={() => {
                 _save(id, history, true);
@@ -167,9 +251,9 @@ const EditorScreen = () => {
             >
               Upload
             </Button>
-          </div>
-        </Typography>
-      </ThemeProvider>
+          </Container>
+        </div>
+      </div >
     );
   }
 };
