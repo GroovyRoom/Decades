@@ -2,18 +2,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import * as PIXI from "pixi.js-legacy";
-import React, { useRef, useEffect } from "react";
+import { useEffect } from "react";
+import catFrames from "../resources/cat.png";
 
 const Game = (props) => {
-
   useEffect(() => {
-    const gameCanvas = document.createElement('canvas')
-    gameCanvas.width = 640
-    gameCanvas.height = 640
-    gameCanvas.style = "z-index:2;margin-left:-640px;"
+    const gameCanvas = document.createElement("canvas");
+    gameCanvas.width = 640;
+    gameCanvas.height = 640;
 
-    const gameRoot = document.getElementById('game_background')
-    gameRoot.appendChild(gameCanvas)
+    // Important - following 3 lines allow us to "overlay" the game render on top of our actual bitmap image
+    gameCanvas.style = "z-index:2;margin-left:-640px;";
+    const gameRoot = document.getElementById("game_background");
+    gameRoot.appendChild(gameCanvas);
+
+    // Following is the game logic written by Jason
 
     // Load textures
     const app = new PIXI.Application({
@@ -21,12 +24,13 @@ const Game = (props) => {
       height: 640,
       backgroundAlpha: 0,
       view: gameCanvas,
-      antialias: false
+      antialias: false,
     });
-    
+
+    // Allows cat to be pixelated - since it's our style
     PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
-    app.view.setAttribute('tabindex', 0);
+    app.view.setAttribute("tabindex", 0);
 
     class Keyboard {
       constructor() {
@@ -43,10 +47,7 @@ const Game = (props) => {
       }
     }
 
-    app.loader.add(
-      "character",
-      'https://i.imgur.com/eDVBOqQ.png'
-    );
+    app.loader.add("character", catFrames);
 
     app.loader.load((loader, resources) => {
       let kb = new Keyboard();
@@ -140,7 +141,8 @@ const Game = (props) => {
     });
   }, []);
 
-  return (null);
+  // We have a dynamic component - no need to actually return anything
+  return null;
 };
 
 export default Game;

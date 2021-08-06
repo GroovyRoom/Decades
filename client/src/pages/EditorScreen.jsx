@@ -1,76 +1,50 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Canvas from "../components/Canvas";
 import {
   Button,
   TextField,
-  ThemeProvider,
   Typography,
   Slider,
   Container,
-  Box
+  Box,
 } from "@material-ui/core";
-import { createTheme } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { withStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";
-import { ChromePicker, SketchPicker } from 'react-color';
-import Pako from 'pako'
-
-const theme = createTheme({
-  palette: {
-    text: {
-      primary: "#ffffff",
-    },
-  },
-});
-
-const CssTextField = withStyles({
-  root: {
-    "& label": {
-      color: "grey",
-    },
-    "& label.Mui-focused": {
-      color: "white",
-    },
-    "& .MuiInput-underline:after": {
-      borderBottomColor: "white",
-    },
-    "& fieldset": {
-      borderColor: "white",
-    },
-  },
-})(TextField);
+import { ChromePicker } from "react-color";
+import Pako from "pako";
 
 const _save = (id, history, uploadingStateSetter, isPublic = false) => {
   //TODO: well, we could just find canvas on the page and get its frame data... dirty, but could work
-
   const canvas = document.getElementsByTagName("canvas")[0];
   const context = canvas.getContext("2d");
   const imageData = context.getImageData(0, 0, 640, 640);
 
+  // Copy the bitmap for our manipulations
   let bitmap = [];
   for (let i = 0; i < 640 * 640 * 4; i += 4) {
-    // Just RGB, no alpha
     bitmap.push(imageData.data[i]);
     bitmap.push(imageData.data[i + 1]);
     bitmap.push(imageData.data[i + 2]);
     bitmap.push(imageData.data[i + 3]);
   }
 
-  let requestData = { meta: {}, bitmap: [] };
+  let requestData = { meta: {} };
   requestData.meta.name = document.getElementById("name_field").value;
   requestData.meta.songId = document.getElementById("song_field").value;
+
+  // We pass id only when we're updating an existent artwork
   if (id !== "new") {
     requestData.meta.id = id;
   }
 
+  // Flip a switch to make it available to others
   if (isPublic) {
     requestData.meta.public = true;
   }
 
-
-  requestData.meta.bitmap = Pako.deflate(bitmap, { to: 'string' });
+  // Compression step
+  requestData.meta.bitmap = Pako.deflate(bitmap, { to: "string" });
 
   const requestOptions = {
     method: "POST",
@@ -78,13 +52,12 @@ const _save = (id, history, uploadingStateSetter, isPublic = false) => {
     body: JSON.stringify(requestData),
   };
 
-  uploadingStateSetter(1)
-
+  uploadingStateSetter(1);
   fetch(`/api/artworks/save`, requestOptions)
     .then((response) => response.json())
     .then((response) => {
-      uploadingStateSetter(2)
-      history.push(`/editor/${response.id}`)
+      uploadingStateSetter(2);
+      history.push(`/editor/${response.id}`);
     });
 };
 
@@ -93,89 +66,89 @@ const useStyles = makeStyles({
     marginTop: 50,
     marginLeft: 100,
     marginRight: 100,
-    display: 'flex',
-    justifyContent: 'space-around',
+    display: "flex",
+    justifyContent: "space-around",
   },
 
   tools: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    alignContent: 'space-between',
+    display: "flex",
+    flexWrap: "wrap",
+    alignContent: "space-between",
   },
 
   colors: {
-    display: 'flex',
-    justifyContent: 'center'
+    display: "flex",
+    justifyContent: "center",
   },
 
   buttons: {
-    display: 'flex',
-    justifyContent: 'space-around'
+    display: "flex",
+    justifyContent: "space-around",
   },
 
   text: {
-    color: 'white'
+    color: "white",
   },
 
   readyStatusText: {
-    color: 'white',
-    marginLeft: 50
+    color: "white",
+    marginLeft: 50,
   },
 
   uploadingStatusText: {
-    color: '#C3F4FD',
-    marginLeft: 50
+    color: "#C3F4FD",
+    marginLeft: 50,
   },
 
   uploadedStatusText: {
-    color: '#91F8AD',
-    marginLeft: 50
+    color: "#91F8AD",
+    marginLeft: 50,
   },
 
   button: {
-    backgroundColor: '#B7F6FF',
+    backgroundColor: "#B7F6FF",
     borderRadius: 36,
     fontSize: 24,
     maxWidth: 160,
-    padding: '14px 160px',
+    padding: "14px 160px",
     "&:hover": {
-      backgroundColor: '#B7F6FF',
-      boxShadow: '0 8px 16px 0 #626262, 0 6px 20px 0 #626262'
-    }
+      backgroundColor: "#B7F6FF",
+      boxShadow: "0 8px 16px 0 #626262, 0 6px 20px 0 #626262",
+    },
   },
 
   field: {
-    background: '#0A1F1B',
+    background: "#0A1F1B",
   },
 
   label: {
-    background: '#0A1F1B',
-    color: 'white',
+    background: "#0A1F1B",
+    color: "white",
   },
 
   name: {
-    border: '2px solid white',
-    background: '#0A1F1B',
-    color: 'white',
+    border: "2px solid white",
+    background: "#0A1F1B",
+    color: "white",
   },
 
-  loading: { 
-    color: '#fff',
-    display: 'flex',
-    justifyContent: 'center'
-  }
-})
+  loading: {
+    color: "#fff",
+    display: "flex",
+    justifyContent: "center",
+  },
+});
 
 const EditorScreen = () => {
   const { id } = useParams();
   const [artworkData, setArtworkData] = useState(null);
-  const [drawThickness, setDrawThickness] = useState(8)
-  const [drawColor, setDrawColor] = useState({ r: 0, g: 0, b: 255, a: 255 })
+  const [drawThickness, setDrawThickness] = useState(8);
+  const [drawColor, setDrawColor] = useState({ r: 0, g: 0, b: 255, a: 255 });
   const history = useHistory();
   const classes = useStyles();
 
   // 0 - fresh, 1 - uploading, 2 - successfully uploaded
-  const [uploadingState, setUploadingState] = useState(0)
+  const [uploadingState, setUploadingState] = useState(0);
 
   // use effect runs only once on component startup
   useEffect(() => {
@@ -188,16 +161,19 @@ const EditorScreen = () => {
       fetch(`/api/artworks/${id}`)
         .then((response) => response.json())
         .then((result) => {
-          result.bitmap = Pako.inflate(result.meta.bitmap);
+          result.bitmap = null;
+          if (result.meta.bitmap !== null) {
+            result.bitmap = Pako.inflate(result.meta.bitmap);
+          }
           setArtworkData(result);
-        })
+        });
     }
   }, []);
 
   if (artworkData == null) {
     return (
       <div className={classes.loading}>
-          <h2>Loading, please wait...</h2>
+        <h2>Loading, please wait...</h2>
       </div>
     );
   } else {
@@ -206,13 +182,19 @@ const EditorScreen = () => {
         <Canvas
           id="drawing_board"
           bitmap={artworkData.bitmap}
-          color={{ r: drawColor.r, g: drawColor.g, b: drawColor.b, a: drawColor.a * 255.0 }}
+          color={{
+            r: drawColor.r,
+            g: drawColor.g,
+            b: drawColor.b,
+            a: drawColor.a * 255.0,
+          }}
           thickness={drawThickness}
         ></Canvas>
         <div className={classes.tools}>
           <Container>
             <h3 className={classes.text}>Brush Size</h3>
-            <Slider className={classes.text}
+            <Slider
+              className={classes.text}
               id="thickness_slider"
               defaultValue={8.0}
               aria-labelledby="discrete-slider"
@@ -221,15 +203,18 @@ const EditorScreen = () => {
               min={8}
               max={100}
               onChange={(event, val) => {
-                setDrawThickness(val)
+                setDrawThickness(val);
               }}
             ></Slider>
           </Container>
           <Container className={classes.colors}>
             <Container>
-              <ChromePicker color={drawColor} onChange={(color, event) => {
-                setDrawColor(color.rgb)
-              }}></ChromePicker>
+              <ChromePicker
+                color={drawColor}
+                onChange={(color, event) => {
+                  setDrawColor(color.rgb);
+                }}
+              ></ChromePicker>
             </Container>
             <Box className={classes.buttons}>
               <TextField
@@ -260,11 +245,24 @@ const EditorScreen = () => {
               />
             </Box>
           </Container>
-          {uploadingState === 0 ? <Typography className={classes.readyStatusText}>Ready to be saved or uploaded.</Typography> : null}
-          {uploadingState === 1 ? <Typography className={classes.uploadingStatusText}>Uploading, please wait...</Typography> : null}
-          {uploadingState === 2 ? <Typography className={classes.uploadedStatusText}>Successfully uploaded!</Typography> : null}
+          {uploadingState === 0 ? (
+            <Typography className={classes.readyStatusText}>
+              Ready to be saved or uploaded.
+            </Typography>
+          ) : null}
+          {uploadingState === 1 ? (
+            <Typography className={classes.uploadingStatusText}>
+              Uploading, please wait...
+            </Typography>
+          ) : null}
+          {uploadingState === 2 ? (
+            <Typography className={classes.uploadedStatusText}>
+              Successfully uploaded!
+            </Typography>
+          ) : null}
           <Container className={classes.buttons}>
-            <Button className={classes.button}
+            <Button
+              className={classes.button}
               variant="contained"
               disabled={uploadingState === 1}
               onClick={() => {
@@ -273,8 +271,9 @@ const EditorScreen = () => {
             >
               Save
             </Button>
-            <Button className={classes.button}
-            disabled={uploadingState === 1}
+            <Button
+              className={classes.button}
+              disabled={uploadingState === 1}
               variant="contained"
               onClick={() => {
                 _save(id, history, setUploadingState, true);
@@ -284,7 +283,7 @@ const EditorScreen = () => {
             </Button>
           </Container>
         </div>
-      </div >
+      </div>
     );
   }
 };

@@ -1,7 +1,7 @@
 //TODO: remove it and check the warning again
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect } from "react";
 
 const _getMousePos = (canvas, evt) => {
   const rect = canvas.getBoundingClientRect();
@@ -9,18 +9,6 @@ const _getMousePos = (canvas, evt) => {
     x: evt.clientX - rect.left,
     y: evt.clientY - rect.top,
   };
-};
-
-// We store only RGB on server, but the image data needs Alpha channel too
-const _convertToClientBitmap = (serverBitmap) => {
-  let bitmap = [];
-  for (let i = 0; i < 640 * 640 * 3; i += 3) {
-    bitmap.push(serverBitmap[i]);
-    bitmap.push(serverBitmap[i + 1]);
-    bitmap.push(serverBitmap[i + 2]);
-    bitmap.push(255);
-  }
-  return bitmap;
 };
 
 const _generateWhiteBitmap = () => {
@@ -44,12 +32,19 @@ const _renderBitmap = (ctx, bitmap) => {
   ctx.putImageData(imageData, 0, 0);
 };
 
+// Initialize simple splat cache here so that we don't need to upsample the splat every single draw
+let splatCache = [];
+for (let i = 0; i < 1000; i++) {
+  splatCache[i] = null;
+}
+
 const splat88 = [
   0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1,
   1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,
 ];
 
+// Utilizes nearest-neighbour algorithm to increase the splat in size
 const _upsampleSplat = (originalSplat, originalSize, newSize) => {
   const x_src = originalSize;
   const y_src = originalSize;
@@ -78,9 +73,17 @@ const _upsampleSplat = (originalSplat, originalSize, newSize) => {
   return resultSplat;
 };
 
-//color has r, g, b, a
 const _generateColorSplatOfSize = (splatImageData, color, size) => {
-  const splatXX = size === 8 ? splat88 : _upsampleSplat(splat88, 8, size);
+  // Basic memoization
+  let splatXX = null;
+  if (splatCache[size] !== null) {
+    splatXX = splatCache[size];
+  } else {
+    splatXX = size === 8 ? splat88 : _upsampleSplat(splat88, 8, size);
+    splatCache[size] = splatXX;
+  }
+
+  // For each 1 value of the splat we add the color and each 0 we skip (leaves whatever value was there to mimic transparency)
   let index = 0;
   for (const pixel of splatXX) {
     if (pixel === 0) {
@@ -99,10 +102,12 @@ const _generateColorSplatOfSize = (splatImageData, color, size) => {
 };
 
 const _drawSplat = (ctx, radius, color, pos) => {
-  // Right now 8 is min size
+  // Right now 8 is min size because we only upsample from 8 and up
   if (radius < 8) {
     radius = 8;
   }
+
+  // We take a part of an image and "stamp" our splat there on top of it
   const splatSource = ctx.getImageData(
     pos.x - radius / 2,
     pos.y - radius / 2,
@@ -113,28 +118,29 @@ const _drawSplat = (ctx, radius, color, pos) => {
   ctx.putImageData(splatDst, pos.x - radius / 2, pos.y - radius / 2);
 };
 
+// The idea behind this algorithm is to draw splat on each point on the formed line
 const _renderLine = (ctx, thickness, color, start, end) => {
   const direction = { x: end.x - start.x, y: end.y - start.y };
   const magnitude = Math.sqrt(
     direction.x * direction.x + direction.y * direction.y
   );
 
-  //We are just placing a dot, not drawing a line - no need to the rest
+  //We are just placing a dot, not drawing a line - no need to do the rest
   if (magnitude <= 0) {
     _drawSplat(ctx, thickness, color, start);
     return;
   }
 
   let steps = 10.0;
-  //If the distance change dis great, however, we should increas the number of steps
+  //If the distance change is great, we should increase the number of steps to still make the line look continuous
   //Numbers are quite arbitrary.
-  if (magnitude > 10){
-      steps = 30.0
+  if (magnitude > 10) {
+    steps = 30.0;
   }
 
-  if (magnitude > 50){
-    steps = 60.0
-}
+  if (magnitude > 50) {
+    steps = 60.0;
+  }
 
   const stepSize = magnitude / steps;
 
@@ -144,6 +150,7 @@ const _renderLine = (ctx, thickness, color, start, end) => {
     y: direction.y / magnitude,
   };
 
+  // Interpolate along the line and draw splat at each step
   let drawPos = start;
   for (let i = 0; i <= steps; i++) {
     _drawSplat(ctx, thickness, color, drawPos);
@@ -157,7 +164,6 @@ const _renderLine = (ctx, thickness, color, start, end) => {
 const Canvas = (props) => {
   const canvasRef = useRef(null);
 
-  // Runs only once on artwork load
   useEffect(() => {
     // initialize canvas
     const canvas = canvasRef.current;
@@ -167,10 +173,10 @@ const Canvas = (props) => {
 
     // prepare the bitmap
     let bitmap = [];
-    if (props.bitmap == null) {
+    if (props.bitmap === null) {
       bitmap = _generateWhiteBitmap();
     } else {
-      bitmap = props.bitmap
+      bitmap = props.bitmap;
     }
 
     // render the bitmap
@@ -191,13 +197,10 @@ const Canvas = (props) => {
         return;
       }
 
-      if (props.disallowDraw) {
-        return;
-      }
-
       const currentMousePos = _getMousePos(canvas, evt);
 
-      // Draw a line to mitigate the speed of events
+      // Draw a line to mitigate the speed of events.
+      // This solves the problem of user moving the mouse too fast - we just connect the points
       _renderLine(
         context,
         props.thickness,
@@ -210,7 +213,6 @@ const Canvas = (props) => {
       prevMousePos = currentMousePos;
     };
 
-    //TODO:take these functions out.
     const startPaint = (evt) => {
       //Initialize start pos and flip the bool
       prevMousePos = _getMousePos(canvas, evt);
@@ -228,16 +230,19 @@ const Canvas = (props) => {
       isDrawing = false;
     };
 
-    canvas.addEventListener("mousedown", startPaint);
-    canvas.addEventListener("mousemove", paint);
-    canvas.addEventListener("mouseup", endPaint);
-    canvas.addEventListener("mouseleave", endPaint);
+    // Canvas can be in read-only mode when viewing
+    if (!props.disallowDraw) {
+      window.addEventListener("mousedown", startPaint);
+      window.addEventListener("mousemove", paint);
+      window.addEventListener("mouseup", endPaint);
+    }
 
     return () => {
-      canvas.removeEventListener("mousedown", startPaint);
-      canvas.removeEventListener("mousemove", paint);
-      canvas.removeEventListener("mouseup", endPaint);
-      canvas.removeEventListener("mouseleave", endPaint);
+      if (!props.disallowDraw) {
+        window.removeEventListener("mousedown", startPaint);
+        window.removeEventListener("mousemove", paint);
+        window.removeEventListener("mouseup", endPaint);
+      }
     };
   }, [props.thickness, props.color]);
 

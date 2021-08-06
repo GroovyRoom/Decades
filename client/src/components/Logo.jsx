@@ -1,16 +1,13 @@
-import React from 'react'
-import { makeStyles } from '@material-ui/core/styles';
+import React from "react";
+import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
   rootHolder: {
-    // marginTop: '30px',
-    // marginLeft: '475px',
-    display: 'flex',
-    padding: '0 10px',
-    justifyContent: 'center'
+    display: "flex",
+    padding: "0 10px",
+    justifyContent: "center",
   },
 });
-
 
 const Logo = () => {
   const classes = useStyles();

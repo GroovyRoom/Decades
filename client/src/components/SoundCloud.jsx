@@ -1,5 +1,5 @@
-import React from 'react';
-import load from 'load-script';
+import React from "react";
+import load from "load-script";
 
 class SoundCloud extends React.Component {
   constructor(props) {
@@ -14,7 +14,7 @@ class SoundCloud extends React.Component {
   componentDidMount() {
     this.loadScript((widget) => {
       this.initWidget(widget);
-    })
+    });
   }
 
   // on variable update
@@ -26,7 +26,7 @@ class SoundCloud extends React.Component {
   loadScript(callback) {
     return load("https://w.soundcloud.com/player/api.js", () => {
       return callback(window.SC.Widget(this.id));
-    })
+    });
   }
 
   // save the object to gwidget
@@ -39,7 +39,7 @@ class SoundCloud extends React.Component {
     this.gwidget.bind(window.SC.Widget.Events.FINISH, () => {
       this.gwidget.seekTo(0);
       this.gwidget.play();
-    })
+    });
   }
 
   // update the widgets components
@@ -60,16 +60,14 @@ class SoundCloud extends React.Component {
   checkStatusProp() {
     if (this.props.status === -1) {
       this.chromeReload();
-    }
-    else if (this.props.status === 1) {
+    } else if (this.props.status === 1) {
       this.gwidget.bind(window.SC.Widget.Events.READY, () => {
         this.gwidget.play();
-      })
-    }
-    else {
+      });
+    } else {
       this.gwidget.bind(window.SC.Widget.Events.READY, () => {
         this.gwidget.pause();
-      })
+      });
     }
   }
 
@@ -85,9 +83,16 @@ class SoundCloud extends React.Component {
 
   render() {
     return (
-      <iframe src={this.baseURL} width="1" height="1" id={this.id} frameBorder="0" title="SoundCloud widget" allow="autoplay">
-      </iframe>
-    )
+      <iframe
+        src={this.baseURL}
+        width="1"
+        height="1"
+        id={this.id}
+        frameBorder="0"
+        title="SoundCloud widget"
+        allow="autoplay"
+      ></iframe>
+    );
   }
 }
 
