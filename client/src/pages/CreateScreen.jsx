@@ -28,6 +28,12 @@ const useStyles = makeStyles({
   media: {
     height: 290,
   },
+
+  loading: { 
+    color: '#fff',
+    display: 'flex',
+    justifyContent: 'center'
+  }
 });
 
 const CreateScreen = () => {
@@ -58,7 +64,9 @@ const CreateScreen = () => {
   }, [])
 
   if (artworkData == null) {
-    return <div>Loading, please wait...</div>
+    return <div className={classes.loading}>
+        <h2>Loading, please wait...</h2>
+    </div>
   } else {
     return <div className={classes.body}>
       <Container>
